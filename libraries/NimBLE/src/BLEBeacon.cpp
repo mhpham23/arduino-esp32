@@ -20,7 +20,6 @@
 
 #include "BLEBeacon.h"
 #include "BLEUUID.h"
-#include "BLELog.h"
 
 #define ENDIAN_CHANGE_U16(x) ((((x) & 0xFF00) >> 8) + (((x) & 0xFF) << 8))
 
@@ -81,7 +80,7 @@ int8_t BLEBeacon::getSignalPower() {
  */
 void BLEBeacon::setData(const uint8_t *data, uint8_t length) {
   if (length != sizeof(BeaconData)) {
-    NIMBLE_LOGE(LOG_TAG, "Data length must be %d bytes, sent: %d", sizeof(BeaconData), length);
+    log_e(LOG_TAG, "Data length must be %d bytes, sent: %d", sizeof(BeaconData), length);
     return;
   }
   memcpy(&m_beaconData, data, length);

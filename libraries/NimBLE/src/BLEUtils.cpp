@@ -20,7 +20,6 @@
 
 #include "BLEUtils.h"
 #include "BLEAddress.h"
-#include "BLELog.h"
 
 #include "host/ble_hs.h"
 
@@ -57,7 +56,7 @@ BLETaskData::BLETaskData(void *pInstance, int flags, void *buf)
 {
   ble_npl_sem *sem = new ble_npl_sem;
   if (ble_npl_sem_init(sem, 0) != BLE_NPL_OK) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to init semaphore");
+    log_e(LOG_TAG, "Failed to init semaphore");
     delete sem;
     m_pHandle = nullptr;
   } else {
@@ -390,7 +389,7 @@ const char *BLEUtils::gapEventToString(uint8_t eventType) {
       return "BLE_GAP_EVENT_LINK_ESTAB";
 #endif
 #endif
-    default: NIMBLE_LOGD(LOG_TAG, "Unknown event type %d 0x%.2x", eventType, eventType); return "Unknown event type";
+    default: log_d(LOG_TAG, "Unknown event type %d 0x%.2x", eventType, eventType); return "Unknown event type";
   }
 #else   // #if defined(CONFIG_NIMBLE_CPP_ENABLE_GAP_EVENT_CODE_TEXT)
   (void)eventType;
@@ -427,7 +426,7 @@ BLEAddress BLEUtils::generateAddr(bool nrpa) {
   ble_addr_t addr{};
   int rc = ble_hs_id_gen_rnd(nrpa, &addr);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Generate address failed, rc=%d", rc);
+    log_e(LOG_TAG, "Generate address failed, rc=%d", rc);
   }
 
   return BLEAddress{addr};

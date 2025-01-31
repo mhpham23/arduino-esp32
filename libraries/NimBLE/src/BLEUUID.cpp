@@ -20,7 +20,6 @@
 
 #include "BLEUtils.h"
 #include "BLEUUID.h"
-#include "BLELog.h"
 
 /****  FIX COMPILATION ****/
 #undef min
@@ -73,7 +72,7 @@ BLEUUID::BLEUUID(const std::string &value) {
     memcpy(m_uuid.u128.value, &second_half, 8);
     m_uuid.u.type = BLE_UUID_TYPE_128;
   } else {
-    NIMBLE_LOGE(LOG_TAG, "Invalid UUID length");
+    log_e(LOG_TAG, "Invalid UUID length");
     m_uuid.u.type = 0;
   }
 }  // BLEUUID(std::string)
@@ -85,7 +84,7 @@ BLEUUID::BLEUUID(const std::string &value) {
  */
 BLEUUID::BLEUUID(const uint8_t *pData, size_t size) {
   if (ble_uuid_init_from_buf(&m_uuid, pData, size)) {
-    NIMBLE_LOGE(LOG_TAG, "Invalid UUID size");
+    log_e(LOG_TAG, "Invalid UUID size");
     m_uuid.u.type = 0;
   }
 }  // BLEUUID(const uint8_t* pData, size_t size)

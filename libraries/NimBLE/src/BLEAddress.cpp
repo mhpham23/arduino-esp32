@@ -19,7 +19,6 @@
 #if defined(CONFIG_BT_ENABLED)
 
 #include "BLEAddress.h"
-#include "BLELog.h"
 
 #include <algorithm>
 
@@ -78,7 +77,7 @@ BLEAddress::BLEAddress(const std::string &addr, uint8_t type) {
   }
 
   *this = BLEAddress{};
-  NIMBLE_LOGE(LOG_TAG, "Invalid address '%s'", addr.c_str());
+  log_e(LOG_TAG, "Invalid address '%s'", addr.c_str());
 }  // BLEAddress
 
 /**

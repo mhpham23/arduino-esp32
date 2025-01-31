@@ -20,7 +20,6 @@
 
 #include "BLEService.h"
 #include "BLEDescriptor.h"
-#include "BLELog.h"
 
 #include <string>
 
@@ -48,7 +47,7 @@ BLEDescriptor::BLEDescriptor(const BLEUUID &uuid, uint16_t properties, uint16_t 
   : BLELocalValueAttribute{uuid, 0, max_len}, m_pCallbacks{&defaultCallbacks}, m_pCharacteristic{pCharacteristic} {
   // Check if this is the client configuration descriptor and set to removed if true.
   if (uuid == BLEUUID((uint16_t)0x2902)) {
-    NIMBLE_LOGW(LOG_TAG, "Manually created 2902 descriptor has no functionality; please remove.");
+    log_w(LOG_TAG, "Manually created 2902 descriptor has no functionality; please remove.");
     setRemoved(NIMBLE_ATT_REMOVE_HIDE);
   }
 
@@ -136,7 +135,7 @@ void BLEDescriptor::writeEvent(const uint8_t *val, uint16_t len, BLEConnInfo &co
  * @param [in] connInfo A reference to a BLEConnInfo instance containing the peer info.
  */
 void BLEDescriptorCallbacks::onRead(BLEDescriptor *pDescriptor, BLEConnInfo &connInfo) {
-  NIMBLE_LOGD("BLEDescriptorCallbacks", "onRead: default");
+  log_d("BLEDescriptorCallbacks", "onRead: default");
 }  // onRead
 
 /**
@@ -145,7 +144,7 @@ void BLEDescriptorCallbacks::onRead(BLEDescriptor *pDescriptor, BLEConnInfo &con
  * @param [in] connInfo A reference to a BLEConnInfo instance containing the peer info.
  */
 void BLEDescriptorCallbacks::onWrite(BLEDescriptor *pDescriptor, BLEConnInfo &connInfo) {
-  NIMBLE_LOGD("BLEDescriptorCallbacks", "onWrite: default");
+  log_d("BLEDescriptorCallbacks", "onWrite: default");
 }  // onWrite
 
 #endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */

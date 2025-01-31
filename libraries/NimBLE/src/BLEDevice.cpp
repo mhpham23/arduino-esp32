@@ -47,8 +47,6 @@
 #include "BLEServer.h"
 #endif
 
-#include "BLELog.h"
-
 static const char *LOG_TAG = "BLEDevice";
 
 extern "C" void ble_store_config_init(void);
@@ -214,7 +212,7 @@ BLEScan *BLEDevice::getScan() {
  */
 void BLEDevice::setScanDuplicateCacheSize(uint16_t size) {
   if (m_initialized) {
-    NIMBLE_LOGE(LOG_TAG, "Cannot change scan cache size while initialized");
+    log_e(LOG_TAG, "Cannot change scan cache size while initialized");
     return;
   } else {
     if (size > 1000) {
@@ -224,7 +222,7 @@ void BLEDevice::setScanDuplicateCacheSize(uint16_t size) {
     }
   }
 
-  NIMBLE_LOGD(LOG_TAG, "Set duplicate cache size to: %u", size);
+  log_d(LOG_TAG, "Set duplicate cache size to: %u", size);
   m_scanDuplicateSize = size;
 }
 
@@ -243,10 +241,10 @@ void BLEDevice::setScanDuplicateCacheSize(uint16_t size) {
  */
 void BLEDevice::setScanFilterMode(uint8_t mode) {
   if (m_initialized) {
-    NIMBLE_LOGE(LOG_TAG, "Cannot change scan duplicate type while initialized");
+    log_e(LOG_TAG, "Cannot change scan duplicate type while initialized");
     return;
   } else if (mode > 2) {
-    NIMBLE_LOGE(LOG_TAG, "Invalid scan duplicate type");
+    log_e(LOG_TAG, "Invalid scan duplicate type");
     return;
   }
 
@@ -282,7 +280,7 @@ BLEClient *BLEDevice::createClient(const BLEAddress &peerAddress) {
     }
   }
 
-  NIMBLE_LOGE(LOG_TAG, "Unable to create client; already at max: %d", NIMBLE_MAX_CONNECTIONS);
+  log_e(LOG_TAG, "Unable to create client; already at max: %d", NIMBLE_MAX_CONNECTIONS);
   return nullptr;
 }  // createClient
 
@@ -426,7 +424,7 @@ esp_power_level_t BLEDevice::getPowerLevel(esp_ble_power_type_t powerType) {
 bool BLEDevice::setPowerLevel(esp_power_level_t powerLevel, esp_ble_power_type_t powerType) {
   esp_err_t errRc = esp_ble_tx_power_set(powerType, powerLevel);
   if (errRc != ESP_OK) {
-    NIMBLE_LOGE(LOG_TAG, "esp_ble_tx_power_set: rc=%d", errRc);
+    log_e(LOG_TAG, "esp_ble_tx_power_set: rc=%d", errRc);
   }
 
   return errRc == ESP_OK;
@@ -478,7 +476,7 @@ int BLEDevice::getPower(BLETxPowerType type) {
 
   int pwr = getPowerLevel(espPwr);
   if (pwr < 0) {
-    NIMBLE_LOGE(LOG_TAG, "esp_ble_tx_power_get failed rc=%d", pwr);
+    log_e(LOG_TAG, "esp_ble_tx_power_get failed rc=%d", pwr);
     return 0xFF;
   }
 
@@ -507,7 +505,7 @@ int BLEDevice::getPower(BLETxPowerType type) {
 bool BLEDevice::setMTU(uint16_t mtu) {
   int rc = ble_att_set_preferred_mtu(mtu);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Could not set local mtu value to: %d, rc: %d", mtu, rc);
+    log_e(LOG_TAG, "Could not set local mtu value to: %d, rc: %d", mtu, rc);
   }
 
   return rc == 0;
@@ -547,7 +545,7 @@ int BLEDevice::getNumBonds() {
 bool BLEDevice::deleteAllBonds() {
   int rc = ble_store_clear();
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to delete all bonds; rc=%d", rc);
+    log_e(LOG_TAG, "Failed to delete all bonds; rc=%d", rc);
     return false;
   }
   return true;
@@ -632,7 +630,7 @@ bool BLEDevice::whiteListAdd(const BLEAddress &address) {
     m_whiteList.push_back(address);
     int rc = ble_gap_wl_set(reinterpret_cast<ble_addr_t *>(&m_whiteList[0]), m_whiteList.size());
     if (rc != 0) {
-      NIMBLE_LOGE(LOG_TAG, "Failed adding to whitelist rc=%d", rc);
+      log_e(LOG_TAG, "Failed adding to whitelist rc=%d", rc);
       m_whiteList.pop_back();
       return false;
     }
@@ -653,7 +651,7 @@ bool BLEDevice::whiteListRemove(const BLEAddress &address) {
       int rc = ble_gap_wl_set(reinterpret_cast<ble_addr_t *>(&m_whiteList[0]), m_whiteList.size());
       if (rc != 0) {
         m_whiteList.push_back(address);
-        NIMBLE_LOGE(LOG_TAG, "Failed removing from whitelist rc=%d", rc);
+        log_e(LOG_TAG, "Failed removing from whitelist rc=%d", rc);
         return false;
       }
 
@@ -679,7 +677,7 @@ size_t BLEDevice::getWhiteListCount() {
  */
 BLEAddress BLEDevice::getWhiteListAddress(size_t index) {
   if (index > m_whiteList.size()) {
-    NIMBLE_LOGE(LOG_TAG, "Invalid index; %u", index);
+    log_e(LOG_TAG, "Invalid index; %u", index);
     return BLEAddress{};
   }
 
@@ -708,7 +706,7 @@ BLEAddress BLEDevice::getWhiteListAddress(size_t index) {
 bool BLEDevice::setDefaultPhy(uint8_t txPhyMask, uint8_t rxPhyMask) {
   int rc = ble_gap_set_prefered_default_le_phy(txPhyMask, rxPhyMask);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to set default phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Failed to set default phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
   }
 
   return rc == 0;
@@ -726,14 +724,14 @@ void BLEDevice::onReset(int reason) {
 
   m_synced = false;
 
-  NIMBLE_LOGE(LOG_TAG, "Host reset; reason=%d, %s", reason, BLEUtils::returnCodeToString(reason));
+  log_e(LOG_TAG, "Host reset; reason=%d, %s", reason, BLEUtils::returnCodeToString(reason));
 }  // onReset
 
 /**
  * @brief Host synced with controller, all clear to make calls to the stack.
  */
 void BLEDevice::onSync(void) {
-  NIMBLE_LOGI(LOG_TAG, "NimBle host synced.");
+  log_i(LOG_TAG, "NimBle host synced.");
   // This check is needed due to potentially being called multiple times in succession
   // If this happens, the call to scan start may get stuck or cause an advertising fault.
   if (m_synced) {
@@ -747,7 +745,7 @@ void BLEDevice::onSync(void) {
   }
 
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "error ensuring address; rc=%d", rc);
+    log_e(LOG_TAG, "error ensuring address; rc=%d", rc);
     return;
   }
 
@@ -782,7 +780,7 @@ void BLEDevice::onSync(void) {
  * @brief The main host task.
  */
 void BLEDevice::host_task(void *param) {
-  NIMBLE_LOGI(LOG_TAG, "BLE Host Task Started");
+  log_i(LOG_TAG, "BLE Host Task Started");
   nimble_port_run();  // This function will return only when nimble_port_stop() is executed
   nimble_port_freertos_deinit();
 }  // host_task
@@ -805,7 +803,7 @@ bool BLEDevice::init(const std::string &deviceName) {
     }
 
     if (err != ESP_OK) {
-      NIMBLE_LOGE(LOG_TAG, "nvs_flash_init() failed; err=%d", err);
+      log_e(LOG_TAG, "nvs_flash_init() failed; err=%d", err);
       return false;
     }
 
@@ -829,19 +827,19 @@ bool BLEDevice::init(const std::string &deviceName) {
 #   endif
         err = esp_bt_controller_init(&bt_cfg);
         if (err != ESP_OK) {
-            NIMBLE_LOGE(LOG_TAG, "esp_bt_controller_init() failed; err=%d", err);
+            log_e(LOG_TAG, "esp_bt_controller_init() failed; err=%d", err);
             return false;
         }
 
         err = esp_bt_controller_enable(ESP_BT_MODE_BLE);
         if (err != ESP_OK) {
-            NIMBLE_LOGE(LOG_TAG, "esp_bt_controller_enable() failed; err=%d", err);
+            log_e(LOG_TAG, "esp_bt_controller_enable() failed; err=%d", err);
             return false;
         }
 
         err = esp_nimble_hci_init();
         if (err != ESP_OK) {
-            NIMBLE_LOGE(LOG_TAG, "esp_nimble_hci_init() failed; err=%d", err);
+            log_e(LOG_TAG, "esp_nimble_hci_init() failed; err=%d", err);
             return false;
         }
 #  endif
@@ -895,7 +893,7 @@ bool BLEDevice::deinit(bool clearAll) {
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
       rc = esp_nimble_hci_and_controller_deinit();
       if (rc != ESP_OK) {
-        NIMBLE_LOGE(LOG_TAG, "esp_nimble_hci_and_controller_deinit() failed with error: %d", rc);
+        log_e(LOG_TAG, "esp_nimble_hci_and_controller_deinit() failed with error: %d", rc);
       }
 #endif
       m_initialized = false;
@@ -956,7 +954,7 @@ BLEAddress BLEDevice::getAddress() {
   uint8_t type = m_ownAddrType & 1;  // input must be random or public, odd values are random
   int rc = ble_hs_id_copy_addr(type, addr.val, NULL);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "No address, rc: %d", rc);
+    log_e(LOG_TAG, "No address, rc: %d", rc);
   } else {
     addr.type = type;
   }
@@ -976,7 +974,7 @@ BLEAddress BLEDevice::getAddress() {
 bool BLEDevice::setOwnAddrType(uint8_t type) {
   int rc = ble_hs_id_copy_addr(type & 1, NULL, NULL);  // Odd values are random
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Unable to set address type %d, rc=%d", type, rc);
+    log_e(LOG_TAG, "Unable to set address type %d, rc=%d", type, rc);
     return false;
   }
 
@@ -1017,7 +1015,7 @@ bool BLEDevice::setOwnAddr(const BLEAddress &addr) {
 bool BLEDevice::setOwnAddr(const uint8_t *addr) {
   int rc = ble_hs_id_set_rnd(addr);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to set address, rc=%d", rc);
+    log_e(LOG_TAG, "Failed to set address, rc=%d", rc);
     return false;
   }
 
@@ -1035,7 +1033,7 @@ bool BLEDevice::setOwnAddr(const uint8_t *addr) {
  * @param sc If true we will perform secure connection pairing, false we will use legacy pairing.
  */
 void BLEDevice::setSecurityAuth(bool bonding, bool mitm, bool sc) {
-  NIMBLE_LOGD(LOG_TAG, "Setting bonding: %d, mitm: %d, sc: %d", bonding, mitm, sc);
+  log_d(LOG_TAG, "Setting bonding: %d, mitm: %d, sc: %d", bonding, mitm, sc);
   ble_hs_cfg.sm_bonding = bonding;
   ble_hs_cfg.sm_mitm = mitm;
   ble_hs_cfg.sm_sc = sc;
@@ -1118,7 +1116,7 @@ uint32_t BLEDevice::getSecurityPasskey() {
 bool BLEDevice::startSecurity(uint16_t connHandle, int *rcPtr) {
   int rc = ble_gap_security_initiate(connHandle);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_security_initiate: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_security_initiate: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
   }
   if (rcPtr) {
     *rcPtr = rc;
@@ -1136,7 +1134,7 @@ bool BLEDevice::startSecurity(uint16_t connHandle, int *rcPtr) {
 bool BLEDevice::injectPassKey(const BLEConnInfo &peerInfo, uint32_t passkey) {
   ble_sm_io pkey{.action = BLE_SM_IOACT_INPUT, .passkey = passkey};
   int rc = ble_sm_inject_io(peerInfo.getConnHandle(), &pkey);
-  NIMBLE_LOGD(LOG_TAG, "BLE_SM_IOACT_INPUT; ble_sm_inject_io result: %d", rc);
+  log_d(LOG_TAG, "BLE_SM_IOACT_INPUT; ble_sm_inject_io result: %d", rc);
   return rc == 0;
 }
 
@@ -1148,7 +1146,7 @@ bool BLEDevice::injectPassKey(const BLEConnInfo &peerInfo, uint32_t passkey) {
 bool BLEDevice::injectConfirmPasskey(const BLEConnInfo &peerInfo, bool accept) {
   ble_sm_io pkey{.action = BLE_SM_IOACT_NUMCMP, .numcmp_accept = accept};
   int rc = ble_sm_inject_io(peerInfo.getConnHandle(), &pkey);
-  NIMBLE_LOGD(LOG_TAG, "BLE_SM_IOACT_NUMCMP; ble_sm_inject_io result: %d", rc);
+  log_d(LOG_TAG, "BLE_SM_IOACT_NUMCMP; ble_sm_inject_io result: %d", rc);
   return rc == 0;
 }
 #endif  // CONFIG_BT_NIMBLE_ROLE_CENTRAL || CONFIG_BT_NIMBLE_ROLE_PERIPHERAL
@@ -1164,7 +1162,7 @@ bool BLEDevice::injectConfirmPasskey(const BLEConnInfo &peerInfo, bool accept) {
 bool BLEDevice::setDeviceName(const std::string &deviceName) {
   int rc = ble_svc_gap_device_name_set(deviceName.c_str());
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Device name not set - too long");
+    log_e(LOG_TAG, "Device name not set - too long");
     return false;
   }
 
@@ -1179,10 +1177,10 @@ bool BLEDevice::setDeviceName(const std::string &deviceName) {
 bool BLEDevice::setCustomGapHandler(gap_event_handler handler) {
   int rc = ble_gap_event_listener_register(&m_listener, handler, NULL);
   if (rc == BLE_HS_EALREADY) {
-    NIMBLE_LOGI(LOG_TAG, "Already listening to GAP events.");
+    log_i(LOG_TAG, "Already listening to GAP events.");
     return true;
   } else if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_event_listener_register: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_event_listener_register: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
   }
 
   return rc == 0;

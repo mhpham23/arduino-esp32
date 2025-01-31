@@ -20,7 +20,6 @@
 
 #include "BLEServer.h"
 #include "BLEDevice.h"
-#include "BLELog.h"
 
 #if defined(CONFIG_BT_NIMBLE_ROLE_CENTRAL)
 #include "BLEClient.h"
@@ -178,7 +177,7 @@ void BLEServer::start() {
 
   int rc = ble_gatts_start();
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gatts_start; rc=%d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gatts_start; rc=%d, %s", rc, BLEUtils::returnCodeToString(rc));
     return;
   }
 
@@ -192,7 +191,7 @@ void BLEServer::start() {
     if (svc->getRemoved() == 0) {
       rc = ble_gatts_find_svc(svc->getUUID().getBase(), &svc->m_handle);
       if (rc != 0) {
-        NIMBLE_LOGW(
+        log_w(
           LOG_TAG, "GATT Server started without service: %s, Service %s", svc->getUUID().toString().c_str(), svc->isStarted() ? "missing" : "not started"
         );
         continue;  // Skip this service as it was not started
@@ -225,7 +224,7 @@ void BLEServer::start() {
 bool BLEServer::disconnect(uint16_t connHandle, uint8_t reason) const {
   int rc = ble_gap_terminate(connHandle, reason);
   if (rc != 0 && rc != BLE_HS_ENOTCONN && rc != BLE_HS_EALREADY) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_terminate failed: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_terminate failed: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
@@ -289,7 +288,7 @@ std::vector<uint16_t> BLEServer::getPeerDevices() const {
  */
 BLEConnInfo BLEServer::getPeerInfo(uint8_t index) const {
   if (index >= m_connectedPeers.size()) {
-    NIMBLE_LOGE(LOG_TAG, "Invalid index %u", index);
+    log_e(LOG_TAG, "Invalid index %u", index);
     return BLEConnInfo{};
   }
 
@@ -314,7 +313,7 @@ BLEConnInfo BLEServer::getPeerInfo(uint8_t index) const {
 BLEConnInfo BLEServer::getPeerInfo(const BLEAddress &address) const {
   BLEConnInfo peerInfo{};
   if (ble_gap_conn_find_by_addr(address.getBase(), &peerInfo.m_desc) != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Peer info not found");
+    log_e(LOG_TAG, "Peer info not found");
   }
 
   return peerInfo;
@@ -328,7 +327,7 @@ BLEConnInfo BLEServer::getPeerInfo(const BLEAddress &address) const {
 BLEConnInfo BLEServer::getPeerInfoByHandle(uint16_t connHandle) const {
   BLEConnInfo peerInfo{};
   if (ble_gap_conn_find(connHandle, &peerInfo.m_desc) != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Peer info not found");
+    log_e(LOG_TAG, "Peer info not found");
   }
 
   return peerInfo;
@@ -338,7 +337,7 @@ BLEConnInfo BLEServer::getPeerInfoByHandle(uint16_t connHandle) const {
  * @brief Gap event handler.
  */
 int BLEServer::handleGapEvent(ble_gap_event *event, void *arg) {
-  NIMBLE_LOGD(LOG_TAG, ">> handleGapEvent: %s", BLEUtils::gapEventToString(event->type));
+  log_d(LOG_TAG, ">> handleGapEvent: %s", BLEUtils::gapEventToString(event->type));
 
   int rc = 0;
   BLEConnInfo peerInfo{};
@@ -348,7 +347,7 @@ int BLEServer::handleGapEvent(ble_gap_event *event, void *arg) {
     case BLE_GAP_EVENT_CONNECT:
     {
       if (event->connect.status != 0) {
-        NIMBLE_LOGE(LOG_TAG, "Connection failed");
+        log_e(LOG_TAG, "Connection failed");
 #if !CONFIG_BT_NIMBLE_EXT_ADV
         BLEDevice::startAdvertising();
 #endif
@@ -380,7 +379,7 @@ int BLEServer::handleGapEvent(ble_gap_event *event, void *arg) {
         case BLE_HS_EOS:
         case BLE_HS_ECONTROLLER:
         case BLE_HS_ENOTSYNCED:
-          NIMBLE_LOGE(LOG_TAG, "Disconnect - host reset, rc=%d", event->disconnect.reason);
+          log_e(LOG_TAG, "Disconnect - host reset, rc=%d", event->disconnect.reason);
           BLEDevice::onReset(event->disconnect.reason);
           break;
         default: break;
@@ -416,7 +415,7 @@ int BLEServer::handleGapEvent(ble_gap_event *event, void *arg) {
 
     case BLE_GAP_EVENT_SUBSCRIBE:
     {
-      NIMBLE_LOGI(
+      log_i(
         LOG_TAG, "subscribe event; attr_handle=%d, subscribed: %s", event->subscribe.attr_handle,
         ((event->subscribe.cur_notify || event->subscribe.cur_indicate) ? "true" : "false")
       );
@@ -445,7 +444,7 @@ int BLEServer::handleGapEvent(ble_gap_event *event, void *arg) {
 
     case BLE_GAP_EVENT_MTU:
     {
-      NIMBLE_LOGI(LOG_TAG, "mtu update event; conn_handle=%d mtu=%d", event->mtu.conn_handle, event->mtu.value);
+      log_i(LOG_TAG, "mtu update event; conn_handle=%d mtu=%d", event->mtu.conn_handle, event->mtu.value);
       if (ble_gap_conn_find(event->mtu.conn_handle, &peerInfo.m_desc) == 0) {
         pServer->m_pServerCallbacks->onMTUChange(event->mtu.value, peerInfo);
       }
@@ -567,10 +566,10 @@ int BLEServer::handleGapEvent(ble_gap_event *event, void *arg) {
           pkey.passkey = pServer->m_pServerCallbacks->onPassKeyDisplay();
         }
         rc = ble_sm_inject_io(event->passkey.conn_handle, &pkey);
-        NIMBLE_LOGD(LOG_TAG, "BLE_SM_IOACT_DISP; ble_sm_inject_io result: %d", rc);
+        log_d(LOG_TAG, "BLE_SM_IOACT_DISP; ble_sm_inject_io result: %d", rc);
 
       } else if (event->passkey.params.action == BLE_SM_IOACT_NUMCMP) {
-        NIMBLE_LOGD(LOG_TAG, "Passkey on device's display: %" PRIu32, event->passkey.params.numcmp);
+        log_d(LOG_TAG, "Passkey on device's display: %" PRIu32, event->passkey.params.numcmp);
 
         rc = ble_gap_conn_find(event->passkey.conn_handle, &peerInfo.m_desc);
         if (rc != 0) {
@@ -586,9 +585,9 @@ int BLEServer::handleGapEvent(ble_gap_event *event, void *arg) {
         //     pkey.oob[i] = tem_oob[i];
         // }
         // rc = ble_sm_inject_io(event->passkey.conn_handle, &pkey);
-        // NIMBLE_LOGD(LOG_TAG, "BLE_SM_IOACT_OOB; ble_sm_inject_io result: %d", rc);
+        // log_d(LOG_TAG, "BLE_SM_IOACT_OOB; ble_sm_inject_io result: %d", rc);
       } else if (event->passkey.params.action == BLE_SM_IOACT_NONE) {
-        NIMBLE_LOGD(LOG_TAG, "No passkey action required");
+        log_d(LOG_TAG, "No passkey action required");
       }
 
       break;
@@ -597,7 +596,7 @@ int BLEServer::handleGapEvent(ble_gap_event *event, void *arg) {
     default: break;
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< handleGapEvent");
+  log_d(LOG_TAG, "<< handleGapEvent");
   return 0;
 }  // handleGapEvent
 
@@ -605,7 +604,7 @@ int BLEServer::handleGapEvent(ble_gap_event *event, void *arg) {
  * @brief GATT event handler.
  */
 int BLEServer::handleGattEvent(uint16_t connHandle, uint16_t attrHandle, ble_gatt_access_ctxt *ctxt, void *arg) {
-  NIMBLE_LOGD(LOG_TAG, "Gatt %s event", (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR || ctxt->op == BLE_GATT_ACCESS_OP_READ_DSC) ? "Read" : "Write");
+  log_d(LOG_TAG, "Gatt %s event", (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR || ctxt->op == BLE_GATT_ACCESS_OP_READ_DSC) ? "Read" : "Write");
   auto pAtt = static_cast<BLELocalValueAttribute *>(arg);
   const BLEAttValue &val = pAtt->getAttVal();
 
@@ -742,7 +741,7 @@ void BLEServer::removeService(BLEService *service, bool deleteSvc) {
 void BLEServer::addService(BLEService *service) {
   // Check that a service with the supplied UUID does not already exist.
   if (getServiceByUUID(service->getUUID()) != nullptr) {
-    NIMBLE_LOGW(LOG_TAG, "Warning creating a duplicate service UUID: %s", std::string(service->getUUID()).c_str());
+    log_w(LOG_TAG, "Warning creating a duplicate service UUID: %s", std::string(service->getUUID()).c_str());
   }
 
   // If adding a service that was not removed add it and return.
@@ -832,7 +831,7 @@ bool BLEServer::stopAdvertising(uint8_t instId) const {
 bool BLEServer::updatePhy(uint16_t connHandle, uint8_t txPhyMask, uint8_t rxPhyMask, uint16_t phyOptions) {
   int rc = ble_gap_set_prefered_le_phy(connHandle, txPhyMask, rxPhyMask, phyOptions);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to update phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Failed to update phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
   }
 
   return rc == 0;
@@ -848,7 +847,7 @@ bool BLEServer::updatePhy(uint16_t connHandle, uint8_t txPhyMask, uint8_t rxPhyM
 bool BLEServer::getPhy(uint16_t connHandle, uint8_t *txPhy, uint8_t *rxPhy) {
   int rc = ble_gap_read_le_phy(connHandle, txPhy, rxPhy);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to read phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Failed to read phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
   }
 
   return rc == 0;
@@ -906,7 +905,7 @@ void BLEServer::updateConnParams(uint16_t connHandle, uint16_t minInterval, uint
 
   int rc = ble_gap_update_params(connHandle, &params);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Update params error: %d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Update params error: %d, %s", rc, BLEUtils::returnCodeToString(rc));
   }
 }  // updateConnParams
 
@@ -924,7 +923,7 @@ void BLEServer::setDataLen(uint16_t connHandle, uint16_t octets) const {
 
   int rc = ble_gap_set_data_len(connHandle, octets, tx_time);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Set data length error: %d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Set data length error: %d, %s", rc, BLEUtils::returnCodeToString(rc));
   }
 }  // setDataLen
 
@@ -940,7 +939,7 @@ BLEClient *BLEServer::getClient(uint16_t connHandle) {
   BLEConnInfo connInfo;
   int rc = ble_gap_conn_find(connHandle, &connInfo.m_desc);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Client info not found");
+    log_e(LOG_TAG, "Client info not found");
     return nullptr;
   }
 
@@ -978,42 +977,42 @@ void BLEServer::deleteClient() {
 
 /** Default callback handlers */
 void BLEServerCallbacks::onConnect(BLEServer *pServer, BLEConnInfo &connInfo) {
-  NIMBLE_LOGD("BLEServerCallbacks", "onConnect(): Default");
+  log_d("BLEServerCallbacks", "onConnect(): Default");
 }  // onConnect
 
 void BLEServerCallbacks::onDisconnect(BLEServer *pServer, BLEConnInfo &connInfo, int reason) {
-  NIMBLE_LOGD("BLEServerCallbacks", "onDisconnect(): Default");
+  log_d("BLEServerCallbacks", "onDisconnect(): Default");
 }  // onDisconnect
 
 void BLEServerCallbacks::onMTUChange(uint16_t MTU, BLEConnInfo &connInfo) {
-  NIMBLE_LOGD("BLEServerCallbacks", "onMTUChange(): Default");
+  log_d("BLEServerCallbacks", "onMTUChange(): Default");
 }  // onMTUChange
 
 uint32_t BLEServerCallbacks::onPassKeyDisplay() {
-  NIMBLE_LOGD("BLEServerCallbacks", "onPassKeyDisplay: default: 123456");
+  log_d("BLEServerCallbacks", "onPassKeyDisplay: default: 123456");
   return 123456;
 }  // onPassKeyDisplay
 
 void BLEServerCallbacks::onConfirmPassKey(BLEConnInfo &connInfo, uint32_t pin) {
-  NIMBLE_LOGD("BLEServerCallbacks", "onConfirmPasskey: default: true");
+  log_d("BLEServerCallbacks", "onConfirmPasskey: default: true");
   BLEDevice::injectConfirmPasskey(connInfo, true);
 }  // onConfirmPasskey
 
 void BLEServerCallbacks::onIdentity(BLEConnInfo &connInfo) {
-  NIMBLE_LOGD("BLEServerCallbacks", "onIdentity: default");
+  log_d("BLEServerCallbacks", "onIdentity: default");
 }  // onIdentity
 
 void BLEServerCallbacks::onAuthenticationComplete(BLEConnInfo &connInfo) {
-  NIMBLE_LOGD("BLEServerCallbacks", "onAuthenticationComplete: default");
+  log_d("BLEServerCallbacks", "onAuthenticationComplete: default");
 }  // onAuthenticationComplete
 
 void BLEServerCallbacks::onConnParamsUpdate(BLEConnInfo &connInfo) {
-  NIMBLE_LOGD("BLEServerCallbacks", "onConnParamsUpdate: default");
+  log_d("BLEServerCallbacks", "onConnParamsUpdate: default");
 }  // onConnParamsUpdate
 
 #if CONFIG_BT_NIMBLE_EXT_ADV
 void BLEServerCallbacks::onPhyUpdate(BLEConnInfo &connInfo, uint8_t txPhy, uint8_t rxPhy) {
-  NIMBLE_LOGD("BLEServerCallbacks", "onPhyUpdate: default, txPhy: %d, rxPhy: %d", txPhy, rxPhy);
+  log_d("BLEServerCallbacks", "onPhyUpdate: default, txPhy: %d, rxPhy: %d", txPhy, rxPhy);
 }  // onPhyUpdate
 #endif
 

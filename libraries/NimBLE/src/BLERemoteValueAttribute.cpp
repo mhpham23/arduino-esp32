@@ -21,14 +21,13 @@
 #include "BLERemoteValueAttribute.h"
 #include "BLEClient.h"
 #include "BLEUtils.h"
-#include "BLELog.h"
 
 #include <climits>
 
 static const char *LOG_TAG = "BLERemoteValueAttribute";
 
 bool BLERemoteValueAttribute::writeValue(const uint8_t *data, size_t length, bool response) const {
-  NIMBLE_LOGD(LOG_TAG, ">> writeValue()");
+  log_d(LOG_TAG, ">> writeValue()");
 
   const BLEClient *pClient = getClient();
   int retryCount = 1;
@@ -45,7 +44,7 @@ bool BLERemoteValueAttribute::writeValue(const uint8_t *data, size_t length, boo
 
   do {
     if (length > mtu) {
-      NIMBLE_LOGI(LOG_TAG, "writeValue: long write");
+      log_i(LOG_TAG, "writeValue: long write");
       os_mbuf *om = ble_hs_mbuf_from_flat(data, length);
       rc = ble_gattc_write_long(pClient->getConnHandle(), getHandle(), 0, om, BLERemoteValueAttribute::onWriteCB, &taskData);
     } else {
@@ -62,7 +61,7 @@ bool BLERemoteValueAttribute::writeValue(const uint8_t *data, size_t length, boo
       case 0:
       case BLE_HS_EDONE: rc = 0; break;
       case BLE_HS_ATT_ERR(BLE_ATT_ERR_ATTR_NOT_LONG):
-        NIMBLE_LOGE(LOG_TAG, "Long write not supported by peer; Truncating length to %d", mtu);
+        log_e(LOG_TAG, "Long write not supported by peer; Truncating length to %d", mtu);
         retryCount++;
         length = mtu;
         break;
@@ -80,9 +79,9 @@ bool BLERemoteValueAttribute::writeValue(const uint8_t *data, size_t length, boo
 
 Done:
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "<< writeValue failed, rc: %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "<< writeValue failed, rc: %d %s", rc, BLEUtils::returnCodeToString(rc));
   } else {
-    NIMBLE_LOGD(LOG_TAG, "<< writeValue");
+    log_d(LOG_TAG, "<< writeValue");
   }
 
   return (rc == 0);
@@ -97,7 +96,7 @@ int BLERemoteValueAttribute::onWriteCB(uint16_t conn_handle, const ble_gatt_erro
   const auto pAtt = static_cast<BLERemoteValueAttribute *>(pTaskData->m_pInstance);
 
   if (error->status == BLE_HS_ENOTCONN) {
-    NIMBLE_LOGE(LOG_TAG, "<< Write complete; Not connected");
+    log_e(LOG_TAG, "<< Write complete; Not connected");
     BLEUtils::taskRelease(*pTaskData, error->status);
     return error->status;
   }
@@ -106,7 +105,7 @@ int BLERemoteValueAttribute::onWriteCB(uint16_t conn_handle, const ble_gatt_erro
     return 0;
   }
 
-  NIMBLE_LOGI(LOG_TAG, "Write complete; status=%d", error->status);
+  log_i(LOG_TAG, "Write complete; status=%d", error->status);
   BLEUtils::taskRelease(*pTaskData, error->status);
   return 0;
 }
@@ -117,7 +116,7 @@ int BLERemoteValueAttribute::onWriteCB(uint16_t conn_handle, const ble_gatt_erro
  * @return The value of the remote characteristic.
  */
 BLEAttValue BLERemoteValueAttribute::readValue(time_t *timestamp) const {
-  NIMBLE_LOGD(LOG_TAG, ">> readValue()");
+  log_d(LOG_TAG, ">> readValue()");
 
   BLEAttValue value{};
   const BLEClient *pClient = getClient();
@@ -138,7 +137,7 @@ BLEAttValue BLERemoteValueAttribute::readValue(time_t *timestamp) const {
       case BLE_HS_EDONE: rc = 0; break;
       // Characteristic is not long-readable, return with what we have.
       case BLE_HS_ATT_ERR(BLE_ATT_ERR_ATTR_NOT_LONG):
-        NIMBLE_LOGI(LOG_TAG, "Attribute not long");
+        log_i(LOG_TAG, "Attribute not long");
         rc = ble_gattc_read(pClient->getConnHandle(), getHandle(), BLERemoteValueAttribute::onReadCB, &taskData);
         if (rc != 0) {
           goto Done;
@@ -164,9 +163,9 @@ BLEAttValue BLERemoteValueAttribute::readValue(time_t *timestamp) const {
 
 Done:
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "<< readValue failed rc=%d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "<< readValue failed rc=%d, %s", rc, BLEUtils::returnCodeToString(rc));
   } else {
-    NIMBLE_LOGD(LOG_TAG, "<< readValue");
+    log_d(LOG_TAG, "<< readValue");
   }
 
   return value;
@@ -181,7 +180,7 @@ int BLERemoteValueAttribute::onReadCB(uint16_t conn_handle, const ble_gatt_error
   const auto pAtt = static_cast<BLERemoteValueAttribute *>(pTaskData->m_pInstance);
 
   if (error->status == BLE_HS_ENOTCONN) {
-    NIMBLE_LOGE(LOG_TAG, "<< Read complete; Not connected");
+    log_e(LOG_TAG, "<< Read complete; Not connected");
     BLEUtils::taskRelease(*pTaskData, error->status);
     return error->status;
   }
@@ -191,7 +190,7 @@ int BLERemoteValueAttribute::onReadCB(uint16_t conn_handle, const ble_gatt_error
   }
 
   int rc = error->status;
-  NIMBLE_LOGI(LOG_TAG, "Read complete; status=%d", rc);
+  log_i(LOG_TAG, "Read complete; status=%d", rc);
 
   if (rc == 0) {
     if (attr) {
@@ -200,7 +199,7 @@ int BLERemoteValueAttribute::onReadCB(uint16_t conn_handle, const ble_gatt_error
       if ((valBuf->size() + data_len) > BLE_ATT_ATTR_MAX_LEN) {
         rc = BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
       } else {
-        NIMBLE_LOGD(LOG_TAG, "Got %u bytes", data_len);
+        log_d(LOG_TAG, "Got %u bytes", data_len);
         valBuf->append(attr->om->om_data, data_len);
         return 0;
       }

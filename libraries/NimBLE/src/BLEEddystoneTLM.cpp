@@ -20,7 +20,6 @@
 
 #include "BLEEddystoneTLM.h"
 #include "BLEUUID.h"
-#include "BLELog.h"
 
 #define ENDIAN_CHANGE_U16(x) ((((x) & 0xFF00) >> 8) + (((x) & 0xFF) << 8))
 #define ENDIAN_CHANGE_U32(x) ((((x) & 0xFF000000) >> 24) + (((x) & 0x00FF0000) >> 8)) + ((((x) & 0xFF00) << 8) + (((x) & 0xFF) << 24))
@@ -146,7 +145,7 @@ std::string BLEEddystoneTLM::toString() {
  */
 void BLEEddystoneTLM::setData(const uint8_t *data, uint8_t length) {
   if (length != sizeof(m_eddystoneData)) {
-    NIMBLE_LOGE(LOG_TAG, "Unable to set the data ... length passed in was %d and expected %d", length, sizeof(m_eddystoneData));
+    log_e(LOG_TAG, "Unable to set the data ... length passed in was %d and expected %d", length, sizeof(m_eddystoneData));
     return;
   }
   memcpy(&m_eddystoneData, data, length);
@@ -166,7 +165,7 @@ void BLEEddystoneTLM::setData(const BLEEddystoneTLM::BeaconData &data) {
  */
 void BLEEddystoneTLM::setUUID(const BLEUUID &uuid) {
   if (uuid.bitSize() != 16) {
-    NIMBLE_LOGE(LOG_TAG, "UUID must be 16 bits");
+    log_e(LOG_TAG, "UUID must be 16 bits");
     return;
   }
   beaconUUID = *reinterpret_cast<const uint16_t *>(uuid.getValue());

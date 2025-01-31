@@ -23,7 +23,6 @@
 #include "BLERemoteService.h"
 #include "BLEClient.h"
 #include "BLEUtils.h"
-#include "BLELog.h"
 
 #include <climits>
 
@@ -66,7 +65,7 @@ int BLERemoteCharacteristic::descriptorDiscCB(uint16_t connHandle, const ble_gat
   auto pTaskData = (BLETaskData *)filter->taskData;
   const auto pChr = (BLERemoteCharacteristic *)pTaskData->m_pInstance;
   const auto uuid = filter->uuid;  // UUID to filter for
-  NIMBLE_LOGD(LOG_TAG, "Descriptor Discovery >> status: %d handle: %d", rc, (rc == 0) ? dsc->handle : -1);
+  log_d(LOG_TAG, "Descriptor Discovery >> status: %d handle: %d", rc, (rc == 0) ? dsc->handle : -1);
 
   // Results for chrHandle added until rc != 0
   // Must find specified UUID if filter is used
@@ -78,7 +77,7 @@ int BLERemoteCharacteristic::descriptorDiscCB(uint16_t connHandle, const ble_gat
 
   if (rc != 0) {
     BLEUtils::taskRelease(*pTaskData, rc);
-    NIMBLE_LOGD(LOG_TAG, "<< Descriptor Discovery");
+    log_d(LOG_TAG, "<< Descriptor Discovery");
   }
   return rc;
 }
@@ -89,30 +88,30 @@ int BLERemoteCharacteristic::descriptorDiscCB(uint16_t connHandle, const ble_gat
  * @return True if successfully retrieved, success = BLE_HS_EDONE.
  */
 bool BLERemoteCharacteristic::retrieveDescriptors(BLEDescriptorFilter *filter) const {
-  NIMBLE_LOGD(LOG_TAG, ">> retrieveDescriptors() for characteristic: %s", getUUID().toString().c_str());
+  log_d(LOG_TAG, ">> retrieveDescriptors() for characteristic: %s", getUUID().toString().c_str());
 
   // If this is the last handle then there are no descriptors
   if (getHandle() == getRemoteService()->getEndHandle()) {
-    NIMBLE_LOGD(LOG_TAG, "<< retrieveDescriptors(): found 0 descriptors.");
+    log_d(LOG_TAG, "<< retrieveDescriptors(): found 0 descriptors.");
     return true;
   }
 
   int rc =
     ble_gattc_disc_all_dscs(getClient()->getConnHandle(), getHandle(), getRemoteService()->getEndHandle(), BLERemoteCharacteristic::descriptorDiscCB, filter);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gattc_disc_all_dscs: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gattc_disc_all_dscs: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
   BLEUtils::taskWait(filter->taskData, BLE_NPL_TIME_FOREVER);
   rc = ((BLETaskData *)filter->taskData)->m_flags;
   if (rc != BLE_HS_EDONE) {
-    NIMBLE_LOGE(LOG_TAG, "<< retrieveDescriptors(): failed: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "<< retrieveDescriptors(): failed: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
   filter->dsc = m_vDescriptors.back();
-  NIMBLE_LOGD(LOG_TAG, "<< retrieveDescriptors(): found %d descriptors.", m_vDescriptors.size());
+  log_d(LOG_TAG, "<< retrieveDescriptors(): found %d descriptors.", m_vDescriptors.size());
   return true;
 }  // retrieveDescriptors
 
@@ -122,7 +121,7 @@ bool BLERemoteCharacteristic::retrieveDescriptors(BLEDescriptorFilter *filter) c
  * @return The Remote descriptor (if present) or nullptr if not present.
  */
 BLERemoteDescriptor *BLERemoteCharacteristic::getDescriptor(const BLEUUID &uuid) const {
-  NIMBLE_LOGD(LOG_TAG, ">> getDescriptor: uuid: %s", uuid.toString().c_str());
+  log_d(LOG_TAG, ">> getDescriptor: uuid: %s", uuid.toString().c_str());
   BLETaskData taskData(const_cast<BLERemoteCharacteristic *>(this));
   BLEDescriptorFilter filter = {nullptr, &uuid, &taskData};
   BLEUUID uuidTmp;
@@ -151,7 +150,7 @@ BLERemoteDescriptor *BLERemoteCharacteristic::getDescriptor(const BLEUUID &uuid)
   }
 
 Done:
-  NIMBLE_LOGD(LOG_TAG, "<< getDescriptor: %sfound", filter.dsc ? "" : "not ");
+  log_d(LOG_TAG, "<< getDescriptor: %sfound", filter.dsc ? "" : "not ");
   return filter.dsc;
 }  // getDescriptor
 
@@ -205,16 +204,16 @@ const BLERemoteService *BLERemoteCharacteristic::getRemoteService() const {
  * @return false if writing to the descriptor failed.
  */
 bool BLERemoteCharacteristic::setNotify(uint16_t val, notify_callback notifyCallback, bool response) const {
-  NIMBLE_LOGD(LOG_TAG, ">> setNotify()");
+  log_d(LOG_TAG, ">> setNotify()");
 
   m_notifyCallback = notifyCallback;
   BLERemoteDescriptor *desc = getDescriptor(BLEUUID((uint16_t)0x2902));
   if (desc == nullptr) {
-    NIMBLE_LOGW(LOG_TAG, "<< setNotify(): Callback set, CCCD not found");
+    log_w(LOG_TAG, "<< setNotify(): Callback set, CCCD not found");
     return true;
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< setNotify()");
+  log_d(LOG_TAG, "<< setNotify()");
   return desc->writeValue(reinterpret_cast<uint8_t *>(&val), 2, response);
 }  // setNotify
 
@@ -246,14 +245,14 @@ bool BLERemoteCharacteristic::unsubscribe(bool response) const {
  * them. This method does just that.
  */
 void BLERemoteCharacteristic::deleteDescriptors() const {
-  NIMBLE_LOGD(LOG_TAG, ">> deleteDescriptors");
+  log_d(LOG_TAG, ">> deleteDescriptors");
 
   for (const auto &it : m_vDescriptors) {
     delete it;
   }
   std::vector<BLERemoteDescriptor *>().swap(m_vDescriptors);
 
-  NIMBLE_LOGD(LOG_TAG, "<< deleteDescriptors");
+  log_d(LOG_TAG, "<< deleteDescriptors");
 }  // deleteDescriptors
 
 /**
@@ -262,7 +261,7 @@ void BLERemoteCharacteristic::deleteDescriptors() const {
  * @return Number of descriptors left in the vector.
  */
 size_t BLERemoteCharacteristic::deleteDescriptor(const BLEUUID &uuid) const {
-  NIMBLE_LOGD(LOG_TAG, ">> deleteDescriptor");
+  log_d(LOG_TAG, ">> deleteDescriptor");
 
   for (auto it = m_vDescriptors.begin(); it != m_vDescriptors.end(); ++it) {
     if ((*it)->getUUID() == uuid) {
@@ -272,7 +271,7 @@ size_t BLERemoteCharacteristic::deleteDescriptor(const BLEUUID &uuid) const {
     }
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< deleteDescriptor");
+  log_d(LOG_TAG, "<< deleteDescriptor");
   return m_vDescriptors.size();
 }  // deleteDescriptor
 

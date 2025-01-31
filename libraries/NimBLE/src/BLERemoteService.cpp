@@ -23,7 +23,6 @@
 #include "BLEClient.h"
 #include "BLEAttValue.h"
 #include "BLEUtils.h"
-#include "BLELog.h"
 
 #include <climits>
 
@@ -75,7 +74,7 @@ BLERemoteCharacteristic *BLERemoteService::getCharacteristic(const char *uuid) c
  * @return A pointer to the characteristic object, or nullptr if not found.
  */
 BLERemoteCharacteristic *BLERemoteService::getCharacteristic(const BLEUUID &uuid) const {
-  NIMBLE_LOGD(LOG_TAG, ">> getCharacteristic: uuid: %s", uuid.toString().c_str());
+  log_d(LOG_TAG, ">> getCharacteristic: uuid: %s", uuid.toString().c_str());
   BLERemoteCharacteristic *pChar = nullptr;
   size_t prev_size = m_vChars.size();
 
@@ -119,7 +118,7 @@ BLERemoteCharacteristic *BLERemoteService::getCharacteristic(const BLEUUID &uuid
   }
 
 Done:
-  NIMBLE_LOGD(LOG_TAG, "<< Characteristic %sfound", pChar ? "" : "not ");
+  log_d(LOG_TAG, "<< Characteristic %sfound", pChar ? "" : "not ");
   return pChar;
 }  // getCharacteristic
 
@@ -144,12 +143,12 @@ const std::vector<BLERemoteCharacteristic *> &BLERemoteService::getCharacteristi
  * @return success == 0 or error code.
  */
 int BLERemoteService::characteristicDiscCB(uint16_t conn_handle, const ble_gatt_error *error, const ble_gatt_chr *chr, void *arg) {
-  NIMBLE_LOGD(LOG_TAG, "Characteristic Discovery >> status: %d handle: %d", error->status, (error->status == 0) ? chr->def_handle : -1);
+  log_d(LOG_TAG, "Characteristic Discovery >> status: %d handle: %d", error->status, (error->status == 0) ? chr->def_handle : -1);
   auto pTaskData = (BLETaskData *)arg;
   const auto pSvc = (BLERemoteService *)pTaskData->m_pInstance;
 
   if (error->status == BLE_HS_ENOTCONN) {
-    NIMBLE_LOGE(LOG_TAG, "<< Characteristic Discovery; Not connected");
+    log_e(LOG_TAG, "<< Characteristic Discovery; Not connected");
     BLEUtils::taskRelease(*pTaskData, error->status);
     return error->status;
   }
@@ -165,7 +164,7 @@ int BLERemoteService::characteristicDiscCB(uint16_t conn_handle, const ble_gatt_
   }
 
   BLEUtils::taskRelease(*pTaskData, error->status);
-  NIMBLE_LOGD(LOG_TAG, "<< Characteristic Discovery");
+  log_d(LOG_TAG, "<< Characteristic Discovery");
   return error->status;
 }
 
@@ -175,7 +174,7 @@ int BLERemoteService::characteristicDiscCB(uint16_t conn_handle, const ble_gatt_
  * @return True if successful.
  */
 bool BLERemoteService::retrieveCharacteristics(const BLEUUID *uuidFilter) const {
-  NIMBLE_LOGD(LOG_TAG, ">> retrieveCharacteristics()");
+  log_d(LOG_TAG, ">> retrieveCharacteristics()");
   int rc = 0;
   BLETaskData taskData(const_cast<BLERemoteService *>(this));
 
@@ -188,18 +187,18 @@ bool BLERemoteService::retrieveCharacteristics(const BLEUUID *uuidFilter) const 
   }
 
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gattc_disc_chrs rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gattc_disc_chrs rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
   BLEUtils::taskWait(taskData, BLE_NPL_TIME_FOREVER);
   rc = taskData.m_flags;
   if (rc == 0 || rc == BLE_HS_EDONE) {
-    NIMBLE_LOGD(LOG_TAG, "<< retrieveCharacteristics()");
+    log_d(LOG_TAG, "<< retrieveCharacteristics()");
     return true;
   }
 
-  NIMBLE_LOGE(LOG_TAG, "<< retrieveCharacteristics() rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+  log_e(LOG_TAG, "<< retrieveCharacteristics() rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
   return false;
 }  // retrieveCharacteristics
 

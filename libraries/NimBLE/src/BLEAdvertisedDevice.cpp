@@ -21,7 +21,6 @@
 #include "BLEDevice.h"
 #include "BLEAdvertisedDevice.h"
 #include "BLEUtils.h"
-#include "BLELog.h"
 
 #include <climits>
 
@@ -321,7 +320,7 @@ std::string BLEAdvertisedDevice::getServiceData(const BLEUUID &uuid) const {
     data_loc = findServiceData(index, &bytes);
   }
 
-  NIMBLE_LOGI(LOG_TAG, "No service data found");
+  log_i(LOG_TAG, "No service data found");
   return "";
 }  // getServiceData
 

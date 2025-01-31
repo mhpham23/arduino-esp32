@@ -24,7 +24,6 @@
 #include "BLEDevice.h"
 #include "BLEServer.h"
 #include "BLEUtils.h"
-#include "BLELog.h"
 
 static const char *LOG_TAG = "BLEAdvertising";
 
@@ -65,7 +64,7 @@ bool BLEAdvertising::reset() {
  */
 bool BLEAdvertising::setConnectableMode(uint8_t mode) {
   if (mode > BLE_GAP_CONN_MODE_UND) {
-    NIMBLE_LOGE(LOG_TAG, "Invalid connectable mode: %u", mode);
+    log_e(LOG_TAG, "Invalid connectable mode: %u", mode);
     return false;
   }
 
@@ -90,7 +89,7 @@ bool BLEAdvertising::setDiscoverableMode(uint8_t mode) {
     case BLE_GAP_DISC_MODE_NON: m_advData.setFlags(BLE_HS_ADV_F_BREDR_UNSUP); break;
     case BLE_GAP_DISC_MODE_LTD: m_advData.setFlags(BLE_HS_ADV_F_DISC_LTD); break;
     case BLE_GAP_DISC_MODE_GEN: m_advData.setFlags(BLE_HS_ADV_F_DISC_GEN); break;
-    default:                    NIMBLE_LOGE(LOG_TAG, "Invalid discoverable mode: %u", mode); return false;
+    default:                    log_e(LOG_TAG, "Invalid discoverable mode: %u", mode); return false;
   }
 
   m_advParams.disc_mode = mode;
@@ -163,15 +162,15 @@ void BLEAdvertising::setScanFilter(bool scanRequestWhitelistOnly, bool connectWh
  * @return True if advertising started successfully.
  */
 bool BLEAdvertising::start(uint32_t duration, const BLEAddress *dirAddr) {
-  NIMBLE_LOGD(LOG_TAG, ">> Advertising start: duration=%" PRIu32 ", dirAddr=%s", duration, dirAddr ? dirAddr->toString().c_str() : "NULL");
+  log_d(LOG_TAG, ">> Advertising start: duration=%" PRIu32 ", dirAddr=%s", duration, dirAddr ? dirAddr->toString().c_str() : "NULL");
 
   if (!BLEDevice::m_synced) {
-    NIMBLE_LOGE(LOG_TAG, "Host not synced!");
+    log_e(LOG_TAG, "Host not synced!");
     return false;
   }
 
   if (ble_gap_adv_active()) {
-    NIMBLE_LOGW(LOG_TAG, "Advertising already active");
+    log_w(LOG_TAG, "Advertising already active");
     return true;
   }
 
@@ -209,11 +208,11 @@ bool BLEAdvertising::start(uint32_t duration, const BLEAddress *dirAddr) {
   int rc = ble_gap_adv_start(BLEDevice::m_ownAddrType, NULL, duration, &m_advParams, BLEAdvertising::handleGapEvent, this);
 #endif
   if (rc != 0 && rc != BLE_HS_EALREADY) {
-    NIMBLE_LOGE(LOG_TAG, "Error enabling advertising; rc=%d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Error enabling advertising; rc=%d, %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< Advertising start");
+  log_d(LOG_TAG, "<< Advertising start");
   return true;
 }  // start
 
@@ -224,7 +223,7 @@ bool BLEAdvertising::start(uint32_t duration, const BLEAddress *dirAddr) {
 bool BLEAdvertising::stop() {
   int rc = ble_gap_adv_stop();
   if (rc != 0 && rc != BLE_HS_EALREADY) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_adv_stop rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_adv_stop rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
@@ -280,7 +279,7 @@ int BLEAdvertising::handleGapEvent(struct ble_gap_event *event, void *arg) {
       case BLE_HS_EOS:
       case BLE_HS_ECONTROLLER:
       case BLE_HS_ENOTSYNCED:
-        NIMBLE_LOGE(LOG_TAG, "host reset, rc=%d", event->adv_complete.reason);
+        log_e(LOG_TAG, "host reset, rc=%d", event->adv_complete.reason);
         BLEDevice::onReset(event->adv_complete.reason);
         return 0;
       default: break;
@@ -305,11 +304,11 @@ int BLEAdvertising::handleGapEvent(struct ble_gap_event *event, void *arg) {
 bool BLEAdvertising::setAdvertisementData(const BLEAdvertisementData &data) {
   int rc = ble_gap_adv_set_data(&data.getPayload()[0], data.getPayload().size());
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_adv_set_data: %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_adv_set_data: %d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
-  NIMBLE_LOGD(LOG_TAG, "setAdvertisementData: %s", data.toString().c_str());
+  log_d(LOG_TAG, "setAdvertisementData: %s", data.toString().c_str());
   m_advData = data;     // make a copy in the member object in case this is custom.
   m_advDataSet = true;  // Set the flag that indicates the data was set already so we don't set it again.
   return true;
@@ -333,11 +332,11 @@ const BLEAdvertisementData &BLEAdvertising::getAdvertisementData() {
 bool BLEAdvertising::setScanResponseData(const BLEAdvertisementData &data) {
   int rc = ble_gap_adv_rsp_set_data(&data.getPayload()[0], data.getPayload().size());
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_adv_rsp_set_data: %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_adv_rsp_set_data: %d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
-  NIMBLE_LOGD(LOG_TAG, "setScanResponseData: %s", data.toString().c_str());
+  log_d(LOG_TAG, "setScanResponseData: %s", data.toString().c_str());
   m_scanData = data;  // copy the data into the member object in case this is custom.
   return true;
 }  // setScanResponseData

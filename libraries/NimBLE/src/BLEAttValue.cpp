@@ -21,7 +21,6 @@
 #include "nimble/nimble_npl.h"
 
 #include "BLEAttValue.h"
-#include "BLELog.h"
 
 static const char *LOG_TAG = "BLEAttValue";
 
@@ -36,7 +35,7 @@ BLEAttValue::BLEAttValue(uint16_t init_len, uint16_t max_len)
 {
   NIMBLE_CPP_DEBUG_ASSERT(m_attr_value);
   if (m_attr_value == nullptr) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to calloc ctx");
+    log_e(LOG_TAG, "Failed to calloc ctx");
   }
 }
 
@@ -83,7 +82,7 @@ void BLEAttValue::deepCopy(const BLEAttValue &source) {
   uint8_t *res = static_cast<uint8_t *>(realloc(m_attr_value, source.m_capacity + 1));
   NIMBLE_CPP_DEBUG_ASSERT(res);
   if (res == nullptr) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to realloc deepCopy");
+    log_e(LOG_TAG, "Failed to realloc deepCopy");
     return;
   }
 
@@ -111,7 +110,7 @@ BLEAttValue &BLEAttValue::append(const uint8_t *value, uint16_t len) {
   }
 
   if ((m_attr_len + len) > m_attr_max_len) {
-    NIMBLE_LOGE(LOG_TAG, "val > max, len=%u, max=%u", len, m_attr_max_len);
+    log_e(LOG_TAG, "val > max, len=%u, max=%u", len, m_attr_max_len);
     return *this;
   }
 
@@ -123,7 +122,7 @@ BLEAttValue &BLEAttValue::append(const uint8_t *value, uint16_t len) {
   }
   NIMBLE_CPP_DEBUG_ASSERT(res);
   if (res == nullptr) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to realloc append");
+    log_e(LOG_TAG, "Failed to realloc append");
     return *this;
   }
 
@@ -147,7 +146,7 @@ BLEAttValue &BLEAttValue::append(const uint8_t *value, uint16_t len) {
 uint8_t BLEAttValue::operator[](int pos) const {
   NIMBLE_CPP_DEBUG_ASSERT(pos < m_attr_len);
   if (pos >= m_attr_len) {
-    NIMBLE_LOGE(LOG_TAG, "pos >= len, pos=%u, len=%u", pos, m_attr_len);
+    log_e(LOG_TAG, "pos >= len, pos=%u, len=%u", pos, m_attr_len);
     return 0;
   }
   return m_attr_value[pos];

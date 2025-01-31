@@ -20,7 +20,6 @@
 
 #include "BLEScan.h"
 #include "BLEDevice.h"
-#include "BLELog.h"
 
 #include <string>
 #include <climits>
@@ -71,7 +70,7 @@ int BLEScan::handleGapEvent(ble_gap_event *event, void *arg) {
       // stop processing if already connected
       BLEClient *pClient = BLEDevice::getClientByPeerAddress(advertisedAddress);
       if (pClient != nullptr && pClient->isConnected()) {
-        NIMBLE_LOGI(LOG_TAG, "Ignoring device: address: %s, already connected", advertisedAddress.toString().c_str());
+        log_i(LOG_TAG, "Ignoring device: address: %s, already connected", advertisedAddress.toString().c_str());
         return 0;
       }
 #endif
@@ -101,18 +100,18 @@ int BLEScan::handleGapEvent(ble_gap_event *event, void *arg) {
         }
 
         if (isLegacyAdv && event_type == BLE_HCI_ADV_RPT_EVTYPE_SCAN_RSP) {
-          NIMBLE_LOGI(LOG_TAG, "Scan response without advertisement: %s", advertisedAddress.toString().c_str());
+          log_i(LOG_TAG, "Scan response without advertisement: %s", advertisedAddress.toString().c_str());
         }
 
         advertisedDevice = new BLEAdvertisedDevice(event, event_type);
         pScan->m_scanResults.m_deviceVec.push_back(advertisedDevice);
-        NIMBLE_LOGI(LOG_TAG, "New advertiser: %s", advertisedAddress.toString().c_str());
+        log_i(LOG_TAG, "New advertiser: %s", advertisedAddress.toString().c_str());
       } else {
         advertisedDevice->update(event, event_type);
         if (isLegacyAdv && event_type == BLE_HCI_ADV_RPT_EVTYPE_SCAN_RSP) {
-          NIMBLE_LOGI(LOG_TAG, "Scan response from: %s", advertisedAddress.toString().c_str());
+          log_i(LOG_TAG, "Scan response from: %s", advertisedAddress.toString().c_str());
         } else {
-          NIMBLE_LOGI(LOG_TAG, "Duplicate; updated: %s", advertisedAddress.toString().c_str());
+          log_i(LOG_TAG, "Duplicate; updated: %s", advertisedAddress.toString().c_str());
         }
       }
 
@@ -142,7 +141,7 @@ int BLEScan::handleGapEvent(ble_gap_event *event, void *arg) {
 
     case BLE_GAP_EVENT_DISC_COMPLETE:
     {
-      NIMBLE_LOGD(LOG_TAG, "discovery complete; reason=%d", event->disc_complete.reason);
+      log_d(LOG_TAG, "discovery complete; reason=%d", event->disc_complete.reason);
 
       if (pScan->m_maxResults == 0) {
         pScan->clearResults();
@@ -296,10 +295,10 @@ void BLEScan::setPeriod(uint32_t periodMs) {
  * @return True if scan started or false if there was an error.
  */
 bool BLEScan::start(uint32_t duration, bool isContinue, bool restart) {
-  NIMBLE_LOGD(LOG_TAG, ">> start: duration=%" PRIu32, duration);
+  log_d(LOG_TAG, ">> start: duration=%" PRIu32, duration);
   if (isScanning()) {
     if (restart) {
-      NIMBLE_LOGI(LOG_TAG, "Scan already in progress, restarting it");
+      log_i(LOG_TAG, "Scan already in progress, restarting it");
       if (!stop()) {
         return false;
       }
@@ -332,19 +331,19 @@ bool BLEScan::start(uint32_t duration, bool isContinue, bool restart) {
 #endif
   switch (rc) {
     case 0:
-    case BLE_HS_EALREADY: NIMBLE_LOGD(LOG_TAG, "Scan started"); break;
+    case BLE_HS_EALREADY: log_d(LOG_TAG, "Scan started"); break;
 
-    case BLE_HS_EBUSY: NIMBLE_LOGE(LOG_TAG, "Unable to scan - connection in progress."); break;
+    case BLE_HS_EBUSY: log_e(LOG_TAG, "Unable to scan - connection in progress."); break;
 
     case BLE_HS_ETIMEOUT_HCI:
     case BLE_HS_EOS:
     case BLE_HS_ECONTROLLER:
-    case BLE_HS_ENOTSYNCED:   NIMBLE_LOGE(LOG_TAG, "Unable to scan - Host Reset"); break;
+    case BLE_HS_ENOTSYNCED:   log_e(LOG_TAG, "Unable to scan - Host Reset"); break;
 
-    default: NIMBLE_LOGE(LOG_TAG, "Error starting scan; rc=%d, %s", rc, BLEUtils::returnCodeToString(rc)); break;
+    default: log_e(LOG_TAG, "Error starting scan; rc=%d, %s", rc, BLEUtils::returnCodeToString(rc)); break;
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< start()");
+  log_d(LOG_TAG, "<< start()");
   return rc == 0 || rc == BLE_HS_EALREADY;
 }  // start
 
@@ -353,11 +352,11 @@ bool BLEScan::start(uint32_t duration, bool isContinue, bool restart) {
  * @return True if successful.
  */
 bool BLEScan::stop() {
-  NIMBLE_LOGD(LOG_TAG, ">> stop()");
+  log_d(LOG_TAG, ">> stop()");
 
   int rc = ble_gap_disc_cancel();
   if (rc != 0 && rc != BLE_HS_EALREADY) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to cancel scan; rc=%d", rc);
+    log_e(LOG_TAG, "Failed to cancel scan; rc=%d", rc);
     return false;
   }
 
@@ -369,7 +368,7 @@ bool BLEScan::stop() {
     BLEUtils::taskRelease(*m_pTaskData);
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< stop()");
+  log_d(LOG_TAG, "<< stop()");
   return true;
 }  // stop
 
@@ -378,7 +377,7 @@ bool BLEScan::stop() {
  * @param [in] address The address of the device to delete from the results.
  */
 void BLEScan::erase(const BLEAddress &address) {
-  NIMBLE_LOGD(LOG_TAG, "erase device: %s", address.toString().c_str());
+  log_d(LOG_TAG, "erase device: %s", address.toString().c_str());
   for (auto it = m_scanResults.m_deviceVec.begin(); it != m_scanResults.m_deviceVec.end(); ++it) {
     if ((*it)->getAddress() == address) {
       delete *it;
@@ -393,7 +392,7 @@ void BLEScan::erase(const BLEAddress &address) {
  * @param [in] device The device to delete from the results.
  */
 void BLEScan::erase(const BLEAdvertisedDevice *device) {
-  NIMBLE_LOGD(LOG_TAG, "erase device: %s", device->getAddress().toString().c_str());
+  log_d(LOG_TAG, "erase device: %s", device->getAddress().toString().c_str());
   for (auto it = m_scanResults.m_deviceVec.begin(); it != m_scanResults.m_deviceVec.end(); ++it) {
     if ((*it) == device) {
       delete *it;
@@ -419,11 +418,11 @@ void BLEScan::onHostSync() {
  */
 BLEScanResults BLEScan::getResults(uint32_t duration, bool is_continue) {
   if (duration == 0) {
-    NIMBLE_LOGW(LOG_TAG, "Blocking scan called with duration = forever");
+    log_w(LOG_TAG, "Blocking scan called with duration = forever");
   }
 
   if (m_pTaskData != nullptr) {
-    NIMBLE_LOGE(LOG_TAG, "Scan already in progress");
+    log_e(LOG_TAG, "Scan already in progress");
     return m_scanResults;
   }
 
@@ -467,7 +466,7 @@ void BLEScan::clearResults() {
 void BLEScanResults::dump() const {
 #if CONFIG_NIMBLE_CPP_LOG_LEVEL >= 3
   for (const auto &dev : m_deviceVec) {
-    NIMBLE_LOGI(LOG_TAG, "- %s", dev->toString().c_str());
+    log_i(LOG_TAG, "- %s", dev->toString().c_str());
   }
 #endif
 }  // dump
@@ -525,15 +524,15 @@ const BLEAdvertisedDevice *BLEScanResults::getDevice(const BLEAddress &address) 
 static const char *CB_TAG = "BLEScanCallbacks";
 
 void BLEScanCallbacks::onDiscovered(const BLEAdvertisedDevice *pAdvertisedDevice) {
-  NIMBLE_LOGD(CB_TAG, "Discovered: %s", pAdvertisedDevice->toString().c_str());
+  log_d(CB_TAG, "Discovered: %s", pAdvertisedDevice->toString().c_str());
 }
 
 void BLEScanCallbacks::onResult(const BLEAdvertisedDevice *pAdvertisedDevice) {
-  NIMBLE_LOGD(CB_TAG, "Result: %s", pAdvertisedDevice->toString().c_str());
+  log_d(CB_TAG, "Result: %s", pAdvertisedDevice->toString().c_str());
 }
 
 void BLEScanCallbacks::onScanEnd(const BLEScanResults &results, int reason) {
-  NIMBLE_LOGD(CB_TAG, "Scan ended; reason %d, num results: %d", reason, results.getCount());
+  log_d(CB_TAG, "Scan ended; reason %d, num results: %d", reason, results.getCount());
 }
 
 #endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_OBSERVER */

@@ -22,7 +22,6 @@
 #include "BLEDevice.h"
 #include "BLEUtils.h"
 #include "BLEUUID.h"
-#include "BLELog.h"
 
 #include "host/ble_hs_adv.h"
 
@@ -35,7 +34,7 @@ static const char *LOG_TAG = "BLEAdvertisementData";
  */
 bool BLEAdvertisementData::addData(const uint8_t *data, size_t length) {
   if (m_payload.size() + length > BLE_HS_ADV_MAX_SZ) {
-    NIMBLE_LOGE(LOG_TAG, "Data length exceeded");
+    log_e(LOG_TAG, "Data length exceeded");
     return false;
   }
 
@@ -147,7 +146,7 @@ bool BLEAdvertisementData::addServiceUUID(const BLEUUID &serviceUUID) {
     case 2:  type = BLE_HS_ADV_TYPE_COMP_UUIDS16; break;
     case 4:  type = BLE_HS_ADV_TYPE_COMP_UUIDS32; break;
     case 16: type = BLE_HS_ADV_TYPE_COMP_UUIDS128; break;
-    default: NIMBLE_LOGE(LOG_TAG, "Cannot add UUID, invalid size!"); return false;
+    default: log_e(LOG_TAG, "Cannot add UUID, invalid size!"); return false;
   }
 
   int dataLoc = getDataLocation(type);
@@ -157,7 +156,7 @@ bool BLEAdvertisementData::addServiceUUID(const BLEUUID &serviceUUID) {
   }
 
   if (length + getPayload().size() > BLE_HS_ADV_MAX_SZ) {
-    NIMBLE_LOGE(LOG_TAG, "Cannot add UUID, data length exceeded!");
+    log_e(LOG_TAG, "Cannot add UUID, data length exceeded!");
     return false;
   }
 
@@ -196,7 +195,7 @@ bool BLEAdvertisementData::removeServiceUUID(const BLEUUID &serviceUUID) {
     case 2:  type = BLE_HS_ADV_TYPE_COMP_UUIDS16; break;
     case 4:  type = BLE_HS_ADV_TYPE_COMP_UUIDS32; break;
     case 16: type = BLE_HS_ADV_TYPE_COMP_UUIDS128; break;
-    default: NIMBLE_LOGE(LOG_TAG, "Cannot remove UUID, invalid size!"); return false;
+    default: log_e(LOG_TAG, "Cannot remove UUID, invalid size!"); return false;
   }
 
   int dataLoc = getDataLocation(type);
@@ -249,7 +248,7 @@ bool BLEAdvertisementData::removeServices() {
  */
 bool BLEAdvertisementData::setManufacturerData(const uint8_t *data, size_t length) {
   if (length > BLE_HS_ADV_MAX_FIELD_SZ) {
-    NIMBLE_LOGE(LOG_TAG, "MFG data too long");
+    log_e(LOG_TAG, "MFG data too long");
     return false;
   }
 
@@ -285,7 +284,7 @@ bool BLEAdvertisementData::setManufacturerData(const std::vector<uint8_t> &data)
  */
 bool BLEAdvertisementData::setURI(const std::string &uri) {
   if (uri.length() > BLE_HS_ADV_MAX_FIELD_SZ) {
-    NIMBLE_LOGE(LOG_TAG, "URI too long");
+    log_e(LOG_TAG, "URI too long");
     return false;
   }
 
@@ -307,7 +306,7 @@ bool BLEAdvertisementData::setURI(const std::string &uri) {
  */
 bool BLEAdvertisementData::setName(const std::string &name, bool isComplete) {
   if (name.length() > BLE_HS_ADV_MAX_FIELD_SZ) {
-    NIMBLE_LOGE(LOG_TAG, "Name too long - truncating");
+    log_e(LOG_TAG, "Name too long - truncating");
     isComplete = false;
   }
 
@@ -397,11 +396,11 @@ bool BLEAdvertisementData::setServices(bool complete, uint8_t size, const std::v
 
   for (const auto &uuid : uuids) {
     if (uuid.bitSize() != size) {
-      NIMBLE_LOGE(LOG_TAG, "Service UUID(%d) invalid", size);
+      log_e(LOG_TAG, "Service UUID(%d) invalid", size);
       continue;
     } else {
       if (length + bytes >= BLE_HS_ADV_MAX_SZ) {
-        NIMBLE_LOGW(LOG_TAG, "Too many services - truncating");
+        log_w(LOG_TAG, "Too many services - truncating");
         complete = false;
         break;
       }
@@ -416,7 +415,7 @@ bool BLEAdvertisementData::setServices(bool complete, uint8_t size, const std::v
     case 16:  data[1] = (complete ? BLE_HS_ADV_TYPE_COMP_UUIDS16 : BLE_HS_ADV_TYPE_INCOMP_UUIDS16); break;
     case 32:  data[1] = (complete ? BLE_HS_ADV_TYPE_COMP_UUIDS32 : BLE_HS_ADV_TYPE_INCOMP_UUIDS32); break;
     case 128: data[1] = (complete ? BLE_HS_ADV_TYPE_COMP_UUIDS128 : BLE_HS_ADV_TYPE_INCOMP_UUIDS128); break;
-    default:  NIMBLE_LOGE(LOG_TAG, "Cannot set services, invalid size!"); return false;
+    default:  log_e(LOG_TAG, "Cannot set services, invalid size!"); return false;
   }
 
   return addData(data, length);
@@ -434,7 +433,7 @@ bool BLEAdvertisementData::setServiceData(const BLEUUID &uuid, const uint8_t *da
   uint8_t uuidBytes = uuid.bitSize() / 8;
   uint8_t sDataLen = 2 + uuidBytes + length;
   if (sDataLen > BLE_HS_ADV_MAX_SZ) {
-    NIMBLE_LOGE(LOG_TAG, "Service Data too long");
+    log_e(LOG_TAG, "Service Data too long");
     return false;
   }
 
@@ -443,7 +442,7 @@ bool BLEAdvertisementData::setServiceData(const BLEUUID &uuid, const uint8_t *da
     case 2:  type = BLE_HS_ADV_TYPE_SVC_DATA_UUID16; break;
     case 4:  type = BLE_HS_ADV_TYPE_SVC_DATA_UUID32; break;
     case 16: type = BLE_HS_ADV_TYPE_SVC_DATA_UUID128; break;
-    default: NIMBLE_LOGE(LOG_TAG, "Cannot set service data, invalid size!"); return false;
+    default: log_e(LOG_TAG, "Cannot set service data, invalid size!"); return false;
   }
 
   if (length == 0) {

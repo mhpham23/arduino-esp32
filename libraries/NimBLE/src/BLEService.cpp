@@ -26,7 +26,6 @@
 #endif
 #include "BLEDevice.h"
 #include "BLEUtils.h"
-#include "BLELog.h"
 
 #include <string>
 
@@ -64,7 +63,7 @@ BLEService::~BLEService() {
  * @brief Dump details of this BLE GATT service.
  */
 void BLEService::dump() const {
-  NIMBLE_LOGD(LOG_TAG, "Service: uuid:%s, handle: 0x%2x", getUUID().toString().c_str(), getHandle());
+  log_d(LOG_TAG, "Service: uuid:%s, handle: 0x%2x", getUUID().toString().c_str(), getHandle());
 
   std::string res;
   int count = 0;
@@ -80,7 +79,7 @@ void BLEService::dump() const {
     res += ", uuid: " + std::string(it->getUUID());
   }
 
-  NIMBLE_LOGD(LOG_TAG, "Characteristics:\n%s", res.c_str());
+  log_d(LOG_TAG, "Characteristics:\n%s", res.c_str());
 }  // dump
 
 /**
@@ -89,7 +88,7 @@ void BLEService::dump() const {
  * @return bool success/failure .
  */
 bool BLEService::start() {
-  NIMBLE_LOGD(LOG_TAG, ">> start(): Starting service: %s", toString().c_str());
+  log_d(LOG_TAG, ">> start(): Starting service: %s", toString().c_str());
 
   // If started previously and no characteristics have been added or removed,
   // then we can skip the service registration process.
@@ -113,7 +112,7 @@ bool BLEService::start() {
     ++numChrs;
   }
 
-  NIMBLE_LOGD(LOG_TAG, "Adding %d characteristics for service %s", numChrs, toString().c_str());
+  log_d(LOG_TAG, "Adding %d characteristics for service %s", numChrs, toString().c_str());
   if (numChrs) {
     int i = 0;
 
@@ -170,17 +169,17 @@ bool BLEService::start() {
   m_pSvcDef->type = BLE_GATT_SVC_TYPE_PRIMARY;
   int rc = ble_gatts_count_cfg(m_pSvcDef);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gatts_count_cfg failed, rc= %d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gatts_count_cfg failed, rc= %d, %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
   rc = ble_gatts_add_svcs(m_pSvcDef);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gatts_add_svcs, rc= %d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gatts_add_svcs, rc= %d, %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< start()");
+  log_d(LOG_TAG, "<< start()");
   return true;
 }  // start
 
@@ -205,7 +204,7 @@ BLECharacteristic *BLEService::createCharacteristic(const char *uuid, uint32_t p
 BLECharacteristic *BLEService::createCharacteristic(const BLEUUID &uuid, uint32_t properties, uint16_t max_len) {
   BLECharacteristic *pChar = new BLECharacteristic(uuid, properties, max_len, this);
   if (getCharacteristic(uuid) != nullptr) {
-    NIMBLE_LOGD(LOG_TAG, "Adding a duplicate characteristic with UUID: %s", std::string(uuid).c_str());
+    log_d(LOG_TAG, "Adding a duplicate characteristic with UUID: %s", std::string(uuid).c_str());
   }
 
   addCharacteristic(pChar);

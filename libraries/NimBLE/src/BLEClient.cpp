@@ -22,7 +22,6 @@
 #include "BLERemoteService.h"
 #include "BLERemoteCharacteristic.h"
 #include "BLEDevice.h"
-#include "BLELog.h"
 
 #include "nimble/nimble_port.h"
 
@@ -159,26 +158,26 @@ bool BLEClient::connect(const BLEAdvertisedDevice *device, bool deleteAttributes
  * @return true on success.
  */
 bool BLEClient::connect(const BLEAddress &address, bool deleteAttributes, bool asyncConnect, bool exchangeMTU) {
-  NIMBLE_LOGD(LOG_TAG, ">> connect(%s)", address.toString().c_str());
+  log_d(LOG_TAG, ">> connect(%s)", address.toString().c_str());
 
   if (!BLEDevice::m_synced) {
-    NIMBLE_LOGE(LOG_TAG, "Host reset, wait for sync.");
+    log_e(LOG_TAG, "Host reset, wait for sync.");
     return false;
   }
 
   if (isConnected()) {
-    NIMBLE_LOGE(LOG_TAG, "Client already connected");
+    log_e(LOG_TAG, "Client already connected");
     return false;
   }
 
   const ble_addr_t *peerAddr = address.getBase();
   if (ble_gap_conn_find_by_addr(peerAddr, NULL) == 0) {
-    NIMBLE_LOGE(LOG_TAG, "A connection to %s already exists", address.toString().c_str());
+    log_e(LOG_TAG, "A connection to %s already exists", address.toString().c_str());
     return false;
   }
 
   if (address.isNull()) {
-    NIMBLE_LOGE(LOG_TAG, "Invalid peer address; (NULL)");
+    log_e(LOG_TAG, "Invalid peer address; (NULL)");
     return false;
   } else {
     m_peerAddress = address;
@@ -213,12 +212,12 @@ bool BLEClient::connect(const BLEAddress &address, bool deleteAttributes, bool a
 
       case BLE_HS_EDONE:
         // A connection to this device already exists, do not connect twice.
-        NIMBLE_LOGE(LOG_TAG, "Already connected to device; addr=%s", std::string(m_peerAddress).c_str());
+        log_e(LOG_TAG, "Already connected to device; addr=%s", std::string(m_peerAddress).c_str());
         break;
 
-      case BLE_HS_EALREADY: NIMBLE_LOGE(LOG_TAG, "Already attempting to connect"); break;
+      case BLE_HS_EALREADY: log_e(LOG_TAG, "Already attempting to connect"); break;
 
-      default: NIMBLE_LOGE(LOG_TAG, "Failed to connect to %s, rc=%d; %s", std::string(m_peerAddress).c_str(), rc, BLEUtils::returnCodeToString(rc)); break;
+      default: log_e(LOG_TAG, "Failed to connect to %s, rc=%d; %s", std::string(m_peerAddress).c_str(), rc, BLEUtils::returnCodeToString(rc)); break;
     }
 
   } while (rc == BLE_HS_EBUSY);
@@ -242,7 +241,7 @@ bool BLEClient::connect(const BLEAddress &address, bool deleteAttributes, bool a
       taskData.m_flags = 0;
     } else {
       // workaround; if the controller doesn't cancel the connection at the timeout, cancel it here.
-      NIMBLE_LOGE(LOG_TAG, "Connect timeout - cancelling");
+      log_e(LOG_TAG, "Connect timeout - cancelling");
       ble_gap_conn_cancel();
       taskData.m_flags = BLE_HS_ETIMEOUT;
     }
@@ -251,7 +250,7 @@ bool BLEClient::connect(const BLEAddress &address, bool deleteAttributes, bool a
   m_pTaskData = nullptr;
   rc = taskData.m_flags;
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Connection failed; status=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Connection failed; status=%d %s", rc, BLEUtils::returnCodeToString(rc));
     m_lastErr = rc;
     if (m_config.deleteOnConnectFail) {
       BLEDevice::deleteClient(this);
@@ -260,7 +259,7 @@ bool BLEClient::connect(const BLEAddress &address, bool deleteAttributes, bool a
   }
 
   m_pClientCallbacks->onConnect(this);
-  NIMBLE_LOGD(LOG_TAG, "<< connect()");
+  log_d(LOG_TAG, "<< connect()");
   // Check if still connected before returning
   return isConnected();
 }  // connect
@@ -274,7 +273,7 @@ bool BLEClient::connect(const BLEAddress &address, bool deleteAttributes, bool a
  * @details If async=false, this function will block and should not be used in a callback.
  */
 bool BLEClient::secureConnection(bool async) const {
-  NIMBLE_LOGD(LOG_TAG, ">> secureConnection()");
+  log_d(LOG_TAG, ">> secureConnection()");
 
   int rc = 0;
   if (async && !BLEDevice::startSecurity(m_connHandle, &rc)) {
@@ -300,12 +299,12 @@ bool BLEClient::secureConnection(bool async) const {
   m_pTaskData = nullptr;
 
   if (taskData.m_flags == 0) {
-    NIMBLE_LOGD(LOG_TAG, "<< secureConnection: success");
+    log_d(LOG_TAG, "<< secureConnection: success");
     return true;
   }
 
   m_lastErr = taskData.m_flags;
-  NIMBLE_LOGE(LOG_TAG, "secureConnection: failed rc=%d", taskData.m_flags);
+  log_e(LOG_TAG, "secureConnection: failed rc=%d", taskData.m_flags);
   return false;
 
 }  // secureConnection
@@ -317,7 +316,7 @@ bool BLEClient::secureConnection(bool async) const {
 bool BLEClient::disconnect(uint8_t reason) {
   int rc = ble_gap_terminate(m_connHandle, reason);
   if (rc != 0 && rc != BLE_HS_ENOTCONN && rc != BLE_HS_EALREADY) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_terminate failed: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_terminate failed: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
     m_lastErr = rc;
     return false;
   }
@@ -332,7 +331,7 @@ bool BLEClient::disconnect(uint8_t reason) {
 bool BLEClient::cancelConnect() const {
   int rc = ble_gap_conn_cancel();
   if (rc != 0 && rc != BLE_HS_EALREADY) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_conn_cancel failed: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_conn_cancel failed: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
     m_lastErr = rc;
     return false;
   }
@@ -400,7 +399,7 @@ void BLEClient::setConnectPhy(uint8_t mask) {
 bool BLEClient::updatePhy(uint8_t txPhyMask, uint8_t rxPhyMask, uint16_t phyOptions) {
   int rc = ble_gap_set_prefered_le_phy(m_connHandle, txPhyMask, rxPhyMask, phyOptions);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to update phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Failed to update phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
   }
 
   return rc == 0;
@@ -415,7 +414,7 @@ bool BLEClient::updatePhy(uint8_t txPhyMask, uint8_t rxPhyMask, uint16_t phyOpti
 bool BLEClient::getPhy(uint8_t *txPhy, uint8_t *rxPhy) {
   int rc = ble_gap_read_le_phy(m_connHandle, txPhy, rxPhy);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to read phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Failed to read phy; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
   }
 
   return rc == 0;
@@ -467,7 +466,7 @@ bool BLEClient::updateConnParams(uint16_t minInterval, uint16_t maxInterval, uin
 
   int rc = ble_gap_update_params(m_connHandle, &params);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Update params error: %d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Update params error: %d, %s", rc, BLEUtils::returnCodeToString(rc));
     m_lastErr = rc;
   }
 
@@ -486,7 +485,7 @@ bool BLEClient::setDataLen(uint16_t txOctets) {
   uint16_t txTime = (txOctets + 14) * 8;
   int rc = ble_gap_set_data_len(m_connHandle, txOctets, txTime);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Set data length error: %d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Set data length error: %d, %s", rc, BLEUtils::returnCodeToString(rc));
   }
 
   return rc == 0;
@@ -499,7 +498,7 @@ bool BLEClient::setDataLen(uint16_t txOctets) {
 BLEConnInfo BLEClient::getConnInfo() const {
   BLEConnInfo connInfo{};
   if (ble_gap_conn_find(m_connHandle, &connInfo.m_desc) != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Connection info not found");
+    log_e(LOG_TAG, "Connection info not found");
   }
 
   return connInfo;
@@ -536,7 +535,7 @@ BLEAddress BLEClient::getPeerAddress() const {
  */
 bool BLEClient::setPeerAddress(const BLEAddress &address) {
   if (isConnected()) {
-    NIMBLE_LOGE(LOG_TAG, "Cannot set peer address while connected");
+    log_e(LOG_TAG, "Cannot set peer address while connected");
     return false;
   }
 
@@ -550,14 +549,14 @@ bool BLEClient::setPeerAddress(const BLEAddress &address) {
  */
 int BLEClient::getRssi() const {
   if (!isConnected()) {
-    NIMBLE_LOGE(LOG_TAG, "getRssi(): Not connected");
+    log_e(LOG_TAG, "getRssi(): Not connected");
     return 0;
   }
 
   int8_t rssi = 0;
   int rc = ble_gap_conn_rssi(m_connHandle, &rssi);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Failed to read RSSI error code: %d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Failed to read RSSI error code: %d, %s", rc, BLEUtils::returnCodeToString(rc));
     m_lastErr = rc;
     return 0;
   }
@@ -596,11 +595,11 @@ BLERemoteService *BLEClient::getService(const char *uuid) {
  * @return A pointer to the service or nullptr if not found.
  */
 BLERemoteService *BLEClient::getService(const BLEUUID &uuid) {
-  NIMBLE_LOGD(LOG_TAG, ">> getService: uuid: %s", uuid.toString().c_str());
+  log_d(LOG_TAG, ">> getService: uuid: %s", uuid.toString().c_str());
 
   for (auto &it : m_svcVec) {
     if (it->getUUID() == uuid) {
-      NIMBLE_LOGD(LOG_TAG, "<< getService: found the service with uuid: %s", uuid.toString().c_str());
+      log_d(LOG_TAG, "<< getService: found the service with uuid: %s", uuid.toString().c_str());
       return it;
     }
   }
@@ -637,7 +636,7 @@ BLERemoteService *BLEClient::getService(const BLEUUID &uuid) {
     }
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< getService: not found");
+  log_d(LOG_TAG, "<< getService: not found");
   return nullptr;
 }  // getService
 
@@ -652,9 +651,9 @@ const std::vector<BLERemoteService *> &BLEClient::getServices(bool refresh) {
   if (refresh) {
     deleteServices();
     if (!retrieveServices()) {
-      NIMBLE_LOGE(LOG_TAG, "Error: Failed to get services");
+      log_e(LOG_TAG, "Error: Failed to get services");
     } else {
-      NIMBLE_LOGI(LOG_TAG, "Found %d services", m_svcVec.size());
+      log_i(LOG_TAG, "Found %d services", m_svcVec.size());
     }
   }
 
@@ -693,7 +692,7 @@ bool BLEClient::discoverAttributes() {
  */
 bool BLEClient::retrieveServices(const BLEUUID *uuidFilter) {
   if (!isConnected()) {
-    NIMBLE_LOGE(LOG_TAG, "Disconnected, could not retrieve services -aborting");
+    log_e(LOG_TAG, "Disconnected, could not retrieve services -aborting");
     return false;
   }
 
@@ -707,7 +706,7 @@ bool BLEClient::retrieveServices(const BLEUUID *uuidFilter) {
   }
 
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "ble_gattc_disc_all_svcs: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gattc_disc_all_svcs: rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
     m_lastErr = rc;
     return false;
   }
@@ -719,7 +718,7 @@ bool BLEClient::retrieveServices(const BLEUUID *uuidFilter) {
   }
 
   m_lastErr = rc;
-  NIMBLE_LOGE(LOG_TAG, "Could not retrieve services, rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+  log_e(LOG_TAG, "Could not retrieve services, rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
   return false;
 }  // getServices
 
@@ -729,13 +728,13 @@ bool BLEClient::retrieveServices(const BLEUUID *uuidFilter) {
  * the API will call this and report findings.
  */
 int BLEClient::serviceDiscoveredCB(uint16_t connHandle, const struct ble_gatt_error *error, const struct ble_gatt_svc *service, void *arg) {
-  NIMBLE_LOGD(LOG_TAG, "Service Discovered >> status: %d handle: %d", error->status, (error->status == 0) ? service->start_handle : -1);
+  log_d(LOG_TAG, "Service Discovered >> status: %d handle: %d", error->status, (error->status == 0) ? service->start_handle : -1);
 
   BLETaskData *pTaskData = (BLETaskData *)arg;
   BLEClient *pClient = (BLEClient *)pTaskData->m_pInstance;
 
   if (error->status == BLE_HS_ENOTCONN) {
-    NIMBLE_LOGE(LOG_TAG, "<< Service Discovered; Disconnected");
+    log_e(LOG_TAG, "<< Service Discovered; Disconnected");
     BLEUtils::taskRelease(*pTaskData, error->status);
     return error->status;
   }
@@ -752,7 +751,7 @@ int BLEClient::serviceDiscoveredCB(uint16_t connHandle, const struct ble_gatt_er
   }
 
   BLEUtils::taskRelease(*pTaskData, error->status);
-  NIMBLE_LOGD(LOG_TAG, "<< Service Discovered");
+  log_d(LOG_TAG, "<< Service Discovered");
   return error->status;
 }  // serviceDiscoveredCB
 
@@ -763,7 +762,7 @@ int BLEClient::serviceDiscoveredCB(uint16_t connHandle, const struct ble_gatt_er
  * @returns characteristic value or an empty value if not found.
  */
 BLEAttValue BLEClient::getValue(const BLEUUID &serviceUUID, const BLEUUID &characteristicUUID) {
-  NIMBLE_LOGD(LOG_TAG, ">> getValue: serviceUUID: %s, characteristicUUID: %s", serviceUUID.toString().c_str(), characteristicUUID.toString().c_str());
+  log_d(LOG_TAG, ">> getValue: serviceUUID: %s, characteristicUUID: %s", serviceUUID.toString().c_str(), characteristicUUID.toString().c_str());
 
   BLEAttValue ret{};
   auto pService = getService(serviceUUID);
@@ -774,7 +773,7 @@ BLEAttValue BLEClient::getValue(const BLEUUID &serviceUUID, const BLEUUID &chara
     }
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< getValue");
+  log_d(LOG_TAG, "<< getValue");
   return ret;
 }  // getValue
 
@@ -787,7 +786,7 @@ BLEAttValue BLEClient::getValue(const BLEUUID &serviceUUID, const BLEUUID &chara
  * @returns true if successful otherwise false
  */
 bool BLEClient::setValue(const BLEUUID &serviceUUID, const BLEUUID &characteristicUUID, const BLEAttValue &value, bool response) {
-  NIMBLE_LOGD(LOG_TAG, ">> setValue: serviceUUID: %s, characteristicUUID: %s", serviceUUID.toString().c_str(), characteristicUUID.toString().c_str());
+  log_d(LOG_TAG, ">> setValue: serviceUUID: %s, characteristicUUID: %s", serviceUUID.toString().c_str(), characteristicUUID.toString().c_str());
 
   bool ret = false;
   auto pService = getService(serviceUUID);
@@ -798,7 +797,7 @@ bool BLEClient::setValue(const BLEUUID &serviceUUID, const BLEUUID &characterist
     }
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< setValue");
+  log_d(LOG_TAG, "<< setValue");
   return ret;
 }  // setValue
 
@@ -834,7 +833,7 @@ uint16_t BLEClient::getMTU() const {
  * @details When the MTU exchange is complete the API will call this and report the new MTU.
  */
 int BLEClient::exchangeMTUCb(uint16_t conn_handle, const ble_gatt_error *error, uint16_t mtu, void *arg) {
-  NIMBLE_LOGD(LOG_TAG, "exchangeMTUCb: status=%d, mtu=%d", error->status, mtu);
+  log_d(LOG_TAG, "exchangeMTUCb: status=%d, mtu=%d", error->status, mtu);
 
   BLEClient *pClient = (BLEClient *)arg;
   if (pClient->getConnHandle() != conn_handle) {
@@ -842,7 +841,7 @@ int BLEClient::exchangeMTUCb(uint16_t conn_handle, const ble_gatt_error *error, 
   }
 
   if (error->status != 0) {
-    NIMBLE_LOGE(LOG_TAG, "exchangeMTUCb() rc=%d %s", error->status, BLEUtils::returnCodeToString(error->status));
+    log_e(LOG_TAG, "exchangeMTUCb() rc=%d %s", error->status, BLEUtils::returnCodeToString(error->status));
     pClient->m_lastErr = error->status;
   }
 
@@ -856,7 +855,7 @@ int BLEClient::exchangeMTUCb(uint16_t conn_handle, const ble_gatt_error *error, 
 bool BLEClient::exchangeMTU() {
   int rc = ble_gattc_exchange_mtu(m_connHandle, BLEClient::exchangeMTUCb, this);
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "MTU exchange error; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "MTU exchange error; rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
     m_lastErr = rc;
     return false;
   }
@@ -874,7 +873,7 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
   int rc = 0;
   BLETaskData *pTaskData = pClient->m_pTaskData;  // save a copy in case client is deleted
 
-  NIMBLE_LOGD(LOG_TAG, ">> handleGapEvent %s", BLEUtils::gapEventToString(event->type));
+  log_d(LOG_TAG, ">> handleGapEvent %s", BLEUtils::gapEventToString(event->type));
 
   switch (event->type) {
     case BLE_GAP_EVENT_DISCONNECT:
@@ -893,13 +892,13 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
         case BLE_HS_ETIMEOUT_HCI:
         case BLE_HS_ENOTSYNCED:
         case BLE_HS_EOS:
-          NIMBLE_LOGE(LOG_TAG, "Disconnect - host reset, rc=%d", rc);
+          log_e(LOG_TAG, "Disconnect - host reset, rc=%d", rc);
           BLEDevice::onReset(rc);
           break;
         default: break;
       }
 
-      NIMBLE_LOGD(LOG_TAG, "disconnect; reason=%d, %s", rc, BLEUtils::returnCodeToString(rc));
+      log_d(LOG_TAG, "disconnect; reason=%d, %s", rc, BLEUtils::returnCodeToString(rc));
 
       pClient->m_terminateFailCount = 0;
       pClient->m_asyncSecureAttempt = 0;
@@ -969,7 +968,7 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
         return 0;
       }
 
-      NIMBLE_LOGE(LOG_TAG, "Connection termination failure; rc=%d - retrying", event->term_failure.status);
+      log_e(LOG_TAG, "Connection termination failure; rc=%d - retrying", event->term_failure.status);
       if (++pClient->m_terminateFailCount > 2) {
         ble_hs_sched_reset(BLE_HS_ECONTROLLER);
       } else {
@@ -983,7 +982,7 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
       if (pClient->m_connHandle != event->notify_rx.conn_handle) {
         return 0;
       }
-      NIMBLE_LOGD(LOG_TAG, "Notify Received for handle: %d", event->notify_rx.attr_handle);
+      log_d(LOG_TAG, "Notify Received for handle: %d", event->notify_rx.attr_handle);
 
       for (const auto &svc : pClient->m_svcVec) {
         // Dont waste cycles searching services without this handle in its range
@@ -991,11 +990,11 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
           continue;
         }
 
-        NIMBLE_LOGD(LOG_TAG, "checking service %s for handle: %d", svc->getUUID().toString().c_str(), event->notify_rx.attr_handle);
+        log_d(LOG_TAG, "checking service %s for handle: %d", svc->getUUID().toString().c_str(), event->notify_rx.attr_handle);
 
         for (const auto &chr : svc->m_vChars) {
           if (chr->getHandle() == event->notify_rx.attr_handle) {
-            NIMBLE_LOGD(LOG_TAG, "Got Notification for characteristic %s", chr->toString().c_str());
+            log_d(LOG_TAG, "Got Notification for characteristic %s", chr->toString().c_str());
 
             uint32_t data_len = OS_MBUF_PKTLEN(event->notify_rx.om);
             chr->m_value.setValue(event->notify_rx.om->om_data, data_len);
@@ -1017,8 +1016,8 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
       if (pClient->m_connHandle != event->conn_update_req.conn_handle) {
         return 0;
       }
-      NIMBLE_LOGD(LOG_TAG, "Peer requesting to update connection parameters");
-      NIMBLE_LOGD(
+      log_d(LOG_TAG, "Peer requesting to update connection parameters");
+      log_d(
         LOG_TAG, "MinInterval: %d, MaxInterval: %d, Latency: %d, Timeout: %d", event->conn_update_req.peer_params->itvl_min,
         event->conn_update_req.peer_params->itvl_max, event->conn_update_req.peer_params->latency, event->conn_update_req.peer_params->supervision_timeout
       );
@@ -1032,7 +1031,7 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
         event->conn_update_req.self_params->supervision_timeout = pClient->m_connParams.supervision_timeout;
       }
 
-      NIMBLE_LOGD(LOG_TAG, "%s peer params", (rc == 0) ? "Accepted" : "Rejected");
+      log_d(LOG_TAG, "%s peer params", (rc == 0) ? "Accepted" : "Rejected");
       return rc;
     }  // BLE_GAP_EVENT_CONN_UPDATE_REQ, BLE_GAP_EVENT_L2CAP_UPDATE_REQ
 
@@ -1042,9 +1041,9 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
         return 0;
       }
       if (event->conn_update.status == 0) {
-        NIMBLE_LOGI(LOG_TAG, "Connection parameters updated.");
+        log_i(LOG_TAG, "Connection parameters updated.");
       } else {
-        NIMBLE_LOGE(LOG_TAG, "Update connection parameters failed.");
+        log_e(LOG_TAG, "Update connection parameters failed.");
       }
       return 0;
     }  // BLE_GAP_EVENT_CONN_UPDATE
@@ -1113,7 +1112,7 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
         return 0;
       }
 
-      NIMBLE_LOGI(LOG_TAG, "mtu update: mtu=%d", event->mtu.value);
+      log_i(LOG_TAG, "mtu update: mtu=%d", event->mtu.value);
       pClient->m_pClientCallbacks->onMTUChange(pClient, event->mtu.value);
       rc = 0;
       break;
@@ -1133,21 +1132,21 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
       }
 
       if (event->passkey.params.action == BLE_SM_IOACT_NUMCMP) {
-        NIMBLE_LOGD(LOG_TAG, "Passkey on device's display: %" PRIu32, event->passkey.params.numcmp);
+        log_d(LOG_TAG, "Passkey on device's display: %" PRIu32, event->passkey.params.numcmp);
         pClient->m_pClientCallbacks->onConfirmPasskey(peerInfo, event->passkey.params.numcmp);
       } else if (event->passkey.params.action == BLE_SM_IOACT_OOB) {
-        NIMBLE_LOGD(LOG_TAG, "OOB request received");
+        log_d(LOG_TAG, "OOB request received");
         // TODO: Handle out of band pairing
         // struct ble_sm_io pkey;
         // pkey.action = BLE_SM_IOACT_OOB;
         // pClient->onOobPairingRequest(pkey.oob);
         // rc = ble_sm_inject_io(event->passkey.conn_handle, &pkey);
-        // NIMBLE_LOGD(LOG_TAG, "ble_sm_inject_io result: %d", rc);
+        // log_d(LOG_TAG, "ble_sm_inject_io result: %d", rc);
       } else if (event->passkey.params.action == BLE_SM_IOACT_INPUT) {
-        NIMBLE_LOGD(LOG_TAG, "Enter the passkey");
+        log_d(LOG_TAG, "Enter the passkey");
         pClient->m_pClientCallbacks->onPassKeyEntry(peerInfo);
       } else if (event->passkey.params.action == BLE_SM_IOACT_NONE) {
-        NIMBLE_LOGD(LOG_TAG, "No passkey action required");
+        log_d(LOG_TAG, "No passkey action required");
       }
 
       return 0;
@@ -1163,7 +1162,7 @@ int BLEClient::handleGapEvent(struct ble_gap_event *event, void *arg) {
     BLEUtils::taskRelease(*pTaskData, rc);
   }
 
-  NIMBLE_LOGD(LOG_TAG, "<< handleGapEvent");
+  log_d(LOG_TAG, "<< handleGapEvent");
   return 0;
 }  // handleGapEvent
 
@@ -1216,47 +1215,47 @@ int BLEClient::getLastError() const {
 }  // getLastError
 
 void BLEClientCallbacks::onConnect(BLEClient *pClient) {
-  NIMBLE_LOGD(CB_TAG, "onConnect: default");
+  log_d(CB_TAG, "onConnect: default");
 }  // onConnect
 
 void BLEClientCallbacks::onConnectFail(BLEClient *pClient, int reason) {
-  NIMBLE_LOGD(CB_TAG, "onConnectFail: default, reason: %d", reason);
+  log_d(CB_TAG, "onConnectFail: default, reason: %d", reason);
 }  // onConnectFail
 
 void BLEClientCallbacks::onDisconnect(BLEClient *pClient, int reason) {
-  NIMBLE_LOGD(CB_TAG, "onDisconnect: default, reason: %d", reason);
+  log_d(CB_TAG, "onDisconnect: default, reason: %d", reason);
 }  // onDisconnect
 
 bool BLEClientCallbacks::onConnParamsUpdateRequest(BLEClient *pClient, const ble_gap_upd_params *params) {
-  NIMBLE_LOGD(CB_TAG, "onConnParamsUpdateRequest: default");
+  log_d(CB_TAG, "onConnParamsUpdateRequest: default");
   return true;
 }  // onConnParamsUpdateRequest
 
 void BLEClientCallbacks::onPassKeyEntry(BLEConnInfo &connInfo) {
-  NIMBLE_LOGD(CB_TAG, "onPassKeyEntry: default: 123456");
+  log_d(CB_TAG, "onPassKeyEntry: default: 123456");
   BLEDevice::injectPassKey(connInfo, 123456);
 }  // onPassKeyEntry
 
 void BLEClientCallbacks::onAuthenticationComplete(BLEConnInfo &connInfo) {
-  NIMBLE_LOGD(CB_TAG, "onAuthenticationComplete: default");
+  log_d(CB_TAG, "onAuthenticationComplete: default");
 }  // onAuthenticationComplete
 
 void BLEClientCallbacks::onIdentity(BLEConnInfo &connInfo) {
-  NIMBLE_LOGD(CB_TAG, "onIdentity: default");
+  log_d(CB_TAG, "onIdentity: default");
 }  // onIdentity
 
 void BLEClientCallbacks::onConfirmPasskey(BLEConnInfo &connInfo, uint32_t pin) {
-  NIMBLE_LOGD(CB_TAG, "onConfirmPasskey: default: true");
+  log_d(CB_TAG, "onConfirmPasskey: default: true");
   BLEDevice::injectConfirmPasskey(connInfo, true);
 }  // onConfirmPasskey
 
 void BLEClientCallbacks::onMTUChange(BLEClient *pClient, uint16_t mtu) {
-  NIMBLE_LOGD(CB_TAG, "onMTUChange: default");
+  log_d(CB_TAG, "onMTUChange: default");
 }  // onMTUChange
 
 #if CONFIG_BT_NIMBLE_EXT_ADV
 void BLEClientCallbacks::onPhyUpdate(BLEClient *pClient, uint8_t txPhy, uint8_t rxPhy) {
-  NIMBLE_LOGD(CB_TAG, "onPhyUpdate: default, txPhy: %d, rxPhy: %d", txPhy, rxPhy);
+  log_d(CB_TAG, "onPhyUpdate: default, txPhy: %d, rxPhy: %d", txPhy, rxPhy);
 }  // onPhyUpdate
 #endif
 

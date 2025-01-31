@@ -24,7 +24,6 @@
 #include "BLEDevice.h"
 #include "BLEServer.h"
 #include "BLEUtils.h"
-#include "BLELog.h"
 
 static BLEExtAdvertisingCallbacks defaultCallbacks;
 static const char *LOG_TAG = "BLEExtAdvertising";
@@ -75,20 +74,20 @@ bool BLEExtAdvertising::setInstanceData(uint8_t instId, BLEExtAdvertisement &adv
 #endif
 
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Advertising config error: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Advertising config error: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
   os_mbuf *buf;
   buf = os_msys_get_pkthdr(adv.m_payload.size(), 0);
   if (!buf) {
-    NIMBLE_LOGE(LOG_TAG, "Data buffer allocation failed");
+    log_e(LOG_TAG, "Data buffer allocation failed");
     return false;
   }
 
   rc = os_mbuf_append(buf, &adv.m_payload[0], adv.m_payload.size());
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Unable to copy data: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Unable to copy data: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
@@ -99,7 +98,7 @@ bool BLEExtAdvertising::setInstanceData(uint8_t instId, BLEExtAdvertisement &adv
   }
 
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Invalid advertisement data: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Invalid advertisement data: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
@@ -108,7 +107,7 @@ bool BLEExtAdvertising::setInstanceData(uint8_t instId, BLEExtAdvertisement &adv
   }
 
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Error setting advertisement address: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Error setting advertisement address: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
@@ -123,13 +122,13 @@ bool BLEExtAdvertising::setInstanceData(uint8_t instId, BLEExtAdvertisement &adv
 bool BLEExtAdvertising::setScanResponseData(uint8_t instId, BLEExtAdvertisement &data) {
   os_mbuf *buf = os_msys_get_pkthdr(data.m_payload.size(), 0);
   if (!buf) {
-    NIMBLE_LOGE(LOG_TAG, "Data buffer allocation failed");
+    log_e(LOG_TAG, "Data buffer allocation failed");
     return false;
   }
 
   int rc = os_mbuf_append(buf, &data.m_payload[0], data.m_payload.size());
   if (rc != 0) {
-    NIMBLE_LOGE(LOG_TAG, "Unable to copy scan data: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Unable to copy scan data: rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
@@ -147,13 +146,13 @@ bool BLEExtAdvertising::setScanResponseData(uint8_t instId, BLEExtAdvertisement 
 bool BLEExtAdvertising::start(uint8_t instId, int duration, int maxEvents) {
   // If Host is not synced we cannot start advertising.
   if (!BLEDevice::m_synced) {
-    NIMBLE_LOGE(LOG_TAG, "Host reset, wait for sync.");
+    log_e(LOG_TAG, "Host reset, wait for sync.");
     return false;
   }
 
   int rc = ble_gap_ext_adv_start(instId, duration / 10, maxEvents);
   if (rc != 0 && rc != BLE_HS_EALREADY) {
-    NIMBLE_LOGE(LOG_TAG, "Error enabling advertising; rc=%d, %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "Error enabling advertising; rc=%d, %s", rc, BLEUtils::returnCodeToString(rc));
     return false;
   }
 
@@ -173,7 +172,7 @@ bool BLEExtAdvertising::removeInstance(uint8_t instId) {
       return true;
     }
 
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_ext_adv_remove rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_ext_adv_remove rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
   }
 
   return false;
@@ -190,7 +189,7 @@ bool BLEExtAdvertising::removeAll() {
       return true;
     }
 
-    NIMBLE_LOGE(LOG_TAG, "ble_gap_ext_adv_clear rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
+    log_e(LOG_TAG, "ble_gap_ext_adv_clear rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
   }
 
   return false;
@@ -208,7 +207,7 @@ bool BLEExtAdvertising::stop(uint8_t instId) {
     return true;
   }
 
-  NIMBLE_LOGE(LOG_TAG, "ble_gap_ext_adv_stop rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
+  log_e(LOG_TAG, "ble_gap_ext_adv_stop rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
   return false;
 }  // stop
 
@@ -225,7 +224,7 @@ bool BLEExtAdvertising::stop() {
     return true;
   }
 
-  NIMBLE_LOGE(LOG_TAG, "ble_gap_ext_adv_stop rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
+  log_e(LOG_TAG, "ble_gap_ext_adv_stop rc = %d %s", rc, BLEUtils::returnCodeToString(rc));
   return false;
 }  // stop
 
@@ -272,7 +271,7 @@ bool BLEExtAdvertising::isAdvertising() {
  * we need clear the flag so it reloads it.
  */
 void BLEExtAdvertising::onHostSync() {
-  NIMBLE_LOGD(LOG_TAG, "Host re-synced");
+  log_d(LOG_TAG, "Host re-synced");
   for (auto status : m_advStatus) {
     status = false;
   }
@@ -297,7 +296,7 @@ int BLEExtAdvertising::handleGapEvent(ble_gap_event *event, void *arg) {
         case BLE_HS_EOS:
         case BLE_HS_ECONTROLLER:
         case BLE_HS_ENOTSYNCED:
-          NIMBLE_LOGE(LOG_TAG, "host reset, rc = %d", event->adv_complete.reason);
+          log_e(LOG_TAG, "host reset, rc = %d", event->adv_complete.reason);
           BLEDevice::onReset(event->adv_complete.reason);
           return 0;
         default: break;
@@ -322,11 +321,11 @@ int BLEExtAdvertising::handleGapEvent(ble_gap_event *event, void *arg) {
 /* -------------------------------------------------------------------------- */
 
 void BLEExtAdvertisingCallbacks::onStopped(BLEExtAdvertising *pAdv, int reason, uint8_t instId) {
-  NIMBLE_LOGD("BLEExtAdvertisingCallbacks", "onStopped: Default");
+  log_d("BLEExtAdvertisingCallbacks", "onStopped: Default");
 }  // onStopped
 
 void BLEExtAdvertisingCallbacks::onScanRequest(BLEExtAdvertising *pAdv, uint8_t instId, BLEAddress addr) {
-  NIMBLE_LOGD("BLEExtAdvertisingCallbacks", "onScanRequest: Default");
+  log_d("BLEExtAdvertisingCallbacks", "onScanRequest: Default");
 }  // onScanRequest
 
 /* -------------------------------------------------------------------------- */
@@ -682,7 +681,7 @@ bool BLEExtAdvertisement::addServiceUUID(const BLEUUID &serviceUUID) {
     case 2:  type = BLE_HS_ADV_TYPE_COMP_UUIDS16; break;
     case 4:  type = BLE_HS_ADV_TYPE_COMP_UUIDS32; break;
     case 16: type = BLE_HS_ADV_TYPE_COMP_UUIDS128; break;
-    default: NIMBLE_LOGE(LOG_TAG, "Cannot add UUID, invalid size!"); return false;
+    default: log_e(LOG_TAG, "Cannot add UUID, invalid size!"); return false;
   }
 
   int dataLoc = getDataLocation(type);
@@ -692,7 +691,7 @@ bool BLEExtAdvertisement::addServiceUUID(const BLEUUID &serviceUUID) {
   }
 
   if (length + getDataSize() > CONFIG_BT_NIMBLE_MAX_EXT_ADV_DATA_LEN) {
-    NIMBLE_LOGE(LOG_TAG, "Cannot add UUID, data length exceeded!");
+    log_e(LOG_TAG, "Cannot add UUID, data length exceeded!");
     return false;
   }
 
@@ -731,7 +730,7 @@ bool BLEExtAdvertisement::removeServiceUUID(const BLEUUID &serviceUUID) {
     case 2:  type = BLE_HS_ADV_TYPE_COMP_UUIDS16; break;
     case 4:  type = BLE_HS_ADV_TYPE_COMP_UUIDS32; break;
     case 16: type = BLE_HS_ADV_TYPE_COMP_UUIDS128; break;
-    default: NIMBLE_LOGE(LOG_TAG, "Cannot remove UUID, invalid size!"); return false;
+    default: log_e(LOG_TAG, "Cannot remove UUID, invalid size!"); return false;
   }
 
   int dataLoc = getDataLocation(type);
@@ -846,20 +845,20 @@ bool BLEExtAdvertisement::setServices(bool complete, uint8_t size, const std::ve
     case 16:  header[1] = complete ? BLE_HS_ADV_TYPE_COMP_UUIDS16 : BLE_HS_ADV_TYPE_INCOMP_UUIDS16; break;
     case 32:  header[1] = complete ? BLE_HS_ADV_TYPE_COMP_UUIDS32 : BLE_HS_ADV_TYPE_INCOMP_UUIDS32; break;
     case 128: header[1] = complete ? BLE_HS_ADV_TYPE_COMP_UUIDS128 : BLE_HS_ADV_TYPE_INCOMP_UUIDS128; break;
-    default:  NIMBLE_LOGE(LOG_TAG, "Cannot set services, invalid size!"); return false;
+    default:  log_e(LOG_TAG, "Cannot set services, invalid size!"); return false;
   }
 
   if (addData(header, 2)) {
     int count = 0;
     for (const auto &uuid : uuids) {
       if (uuid.bitSize() != size) {
-        NIMBLE_LOGE(LOG_TAG, "Service UUID(%d) invalid", size);
+        log_e(LOG_TAG, "Service UUID(%d) invalid", size);
         continue;
       } else {
         if (addData(uuid.getValue(), uuidBytes)) {
           count++;
         } else {
-          NIMBLE_LOGE(LOG_TAG, "Error setting service UUIDs");
+          log_e(LOG_TAG, "Error setting service UUIDs");
           m_payload.erase(m_payload.end() - 2 - (count * uuidBytes), m_payload.end());
           return false;
         }
@@ -893,7 +892,7 @@ bool BLEExtAdvertisement::setServiceData(const BLEUUID &uuid, const uint8_t *dat
     case 2:  type = BLE_HS_ADV_TYPE_SVC_DATA_UUID16; break;
     case 4:  type = BLE_HS_ADV_TYPE_SVC_DATA_UUID32; break;
     case 16: type = BLE_HS_ADV_TYPE_SVC_DATA_UUID128; break;
-    default: NIMBLE_LOGE(LOG_TAG, "Cannot set service data, invalid size!"); return false;
+    default: log_e(LOG_TAG, "Cannot set service data, invalid size!"); return false;
   }
 
   if (length == 0) {

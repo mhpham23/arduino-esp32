@@ -21,7 +21,6 @@
 #include "BLECharacteristic.h"
 #include "BLE2904.h"
 #include "BLEDevice.h"
-#include "BLELog.h"
 
 static BLECharacteristicCallbacks defaultCallback;
 static const char *LOG_TAG = "BLECharacteristic";
@@ -78,7 +77,7 @@ BLEDescriptor *BLECharacteristic::createDescriptor(const char *uuid, uint32_t pr
 BLEDescriptor *BLECharacteristic::createDescriptor(const BLEUUID &uuid, uint32_t properties, uint16_t maxLen) {
   BLEDescriptor *pDescriptor = nullptr;
   if (uuid == BLEUUID(static_cast<uint16_t>(0x2904))) {
-    NIMBLE_LOGW(LOG_TAG, "0x2904 descriptor should be created with create2904()");
+    log_w(LOG_TAG, "0x2904 descriptor should be created with create2904()");
     pDescriptor = create2904();
   } else {
     pDescriptor = new BLEDescriptor(uuid, properties, maxLen, this);
@@ -277,7 +276,7 @@ bool BLECharacteristic::sendValue(const uint8_t *value, size_t length, bool isNo
       // Must re-create the data buffer on each iteration because it is freed by the calls bellow.
       os_mbuf *om = ble_hs_mbuf_from_flat(value, length);
       if (!om) {
-        NIMBLE_LOGE(LOG_TAG, "<< sendValue: failed to allocate mbuf");
+        log_e(LOG_TAG, "<< sendValue: failed to allocate mbuf");
         return false;
       }
 
@@ -288,7 +287,7 @@ bool BLECharacteristic::sendValue(const uint8_t *value, size_t length, bool isNo
       }
 
       if (rc != 0) {
-        NIMBLE_LOGE(LOG_TAG, "<< sendValue: failed to send value, rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
+        log_e(LOG_TAG, "<< sendValue: failed to send value, rc=%d %s", rc, BLEUtils::returnCodeToString(rc));
         break;
       }
     }
@@ -372,7 +371,7 @@ std::string BLECharacteristic::toString() const {
  * @param [in] connInfo A reference to a BLEConnInfo instance containing the peer info.
  */
 void BLECharacteristicCallbacks::onRead(BLECharacteristic *pCharacteristic, BLEConnInfo &connInfo) {
-  NIMBLE_LOGD("BLECharacteristicCallbacks", "onRead: default");
+  log_d("BLECharacteristicCallbacks", "onRead: default");
 }  // onRead
 
 /**
@@ -381,7 +380,7 @@ void BLECharacteristicCallbacks::onRead(BLECharacteristic *pCharacteristic, BLEC
  * @param [in] connInfo A reference to a BLEConnInfo instance containing the peer info.
  */
 void BLECharacteristicCallbacks::onWrite(BLECharacteristic *pCharacteristic, BLEConnInfo &connInfo) {
-  NIMBLE_LOGD("BLECharacteristicCallbacks", "onWrite: default");
+  log_d("BLECharacteristicCallbacks", "onWrite: default");
 }  // onWrite
 
 /**
@@ -392,7 +391,7 @@ void BLECharacteristicCallbacks::onWrite(BLECharacteristic *pCharacteristic, BLE
  * any other value is an error.
  */
 void BLECharacteristicCallbacks::onStatus(BLECharacteristic *pCharacteristic, int code) {
-  NIMBLE_LOGD("BLECharacteristicCallbacks", "onStatus: default");
+  log_d("BLECharacteristicCallbacks", "onStatus: default");
 }  // onStatus
 
 /**
@@ -406,7 +405,7 @@ void BLECharacteristicCallbacks::onStatus(BLECharacteristic *pCharacteristic, in
  * * 3 = Notifications and Indications
  */
 void BLECharacteristicCallbacks::onSubscribe(BLECharacteristic *pCharacteristic, BLEConnInfo &connInfo, uint16_t subValue) {
-  NIMBLE_LOGD("BLECharacteristicCallbacks", "onSubscribe: default");
+  log_d("BLECharacteristicCallbacks", "onSubscribe: default");
 }
 
 #endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */
