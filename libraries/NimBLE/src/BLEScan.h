@@ -18,7 +18,7 @@
 #ifndef NIMBLE_CPP_SCAN_H_
 #define NIMBLE_CPP_SCAN_H_
 
-#include "nimconfig.h"
+#include "sdkconfig.h"
 #if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_OBSERVER)
 
 #include "BLEAdvertisedDevice.h"

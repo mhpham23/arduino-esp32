@@ -11,7 +11,7 @@
 #include <Arduino.h>
 #include <BLEDevice.h>
 #if !CONFIG_BT_NIMBLE_EXT_ADV
-#error Must enable extended advertising, see nimconfig.h file.
+#error Must enable extended advertising.
 #endif
 
 #define SERVICE_UUID        "ABCD"

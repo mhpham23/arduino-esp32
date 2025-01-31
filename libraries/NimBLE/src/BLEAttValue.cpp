@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "nimconfig.h"
+#include "sdkconfig.h"
 #if defined(CONFIG_BT_ENABLED)
 
 #include "nimble/nimble_npl.h"
@@ -33,7 +33,6 @@ BLEAttValue::BLEAttValue(uint16_t init_len, uint16_t max_len)
     m_timestamp{}
 #endif
 {
-  NIMBLE_CPP_DEBUG_ASSERT(m_attr_value);
   if (m_attr_value == nullptr) {
     log_e(LOG_TAG, "Failed to calloc ctx");
   }
@@ -80,7 +79,6 @@ BLEAttValue &BLEAttValue::operator=(const BLEAttValue &source) {
 // Copy all the data from the source object to this object, including allocated space.
 void BLEAttValue::deepCopy(const BLEAttValue &source) {
   uint8_t *res = static_cast<uint8_t *>(realloc(m_attr_value, source.m_capacity + 1));
-  NIMBLE_CPP_DEBUG_ASSERT(res);
   if (res == nullptr) {
     log_e(LOG_TAG, "Failed to realloc deepCopy");
     return;
@@ -120,7 +118,6 @@ BLEAttValue &BLEAttValue::append(const uint8_t *value, uint16_t len) {
     res = static_cast<uint8_t *>(realloc(m_attr_value, (new_len + 1)));
     m_capacity = new_len;
   }
-  NIMBLE_CPP_DEBUG_ASSERT(res);
   if (res == nullptr) {
     log_e(LOG_TAG, "Failed to realloc append");
     return *this;
@@ -144,7 +141,6 @@ BLEAttValue &BLEAttValue::append(const uint8_t *value, uint16_t len) {
 }
 
 uint8_t BLEAttValue::operator[](int pos) const {
-  NIMBLE_CPP_DEBUG_ASSERT(pos < m_attr_len);
   if (pos >= m_attr_len) {
     log_e(LOG_TAG, "pos >= len, pos=%u, len=%u", pos, m_attr_len);
     return 0;

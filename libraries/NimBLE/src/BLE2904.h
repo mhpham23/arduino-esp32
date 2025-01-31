@@ -18,7 +18,7 @@
 #ifndef NIMBLE_CPP_2904_H_
 #define NIMBLE_CPP_2904_H_
 
-#include "nimconfig.h"
+#include "sdkconfig.h"
 #if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
 
 #include "BLEDescriptor.h"

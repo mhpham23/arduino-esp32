@@ -10,7 +10,7 @@
 #include <Arduino.h>
 #include <BLEDevice.h>
 #if !CONFIG_BT_NIMBLE_EXT_ADV
-#error Must enable extended advertising, see nimconfig.h file.
+#error Must enable extended advertising.
 #endif
 
 static uint32_t scanTime = 10 * 1000;  // In milliseconds, 0 = scan forever

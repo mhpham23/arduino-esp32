@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "nimconfig.h"
+#include "sdkconfig.h"
 #if defined(CONFIG_BT_ENABLED)
 
 #include "BLEDevice.h"
@@ -1193,18 +1193,5 @@ bool BLEDevice::setCustomGapHandler(gap_event_handler handler) {
 std::string BLEDevice::toString() {
   return getAddress().toString();
 }  // toString
-
-#if CONFIG_NIMBLE_CPP_DEBUG_ASSERT_ENABLED
-/**
- * @brief Debug assert - weak function.
- * @param [in] file The file where the assert occurred.
- * @param [in] line The line number where the assert occurred.
- */
-void nimble_cpp_assert(const char *file, unsigned line) {
-  console_printf("Assertion failed at %s:%u\n", file, line);
-  ble_npl_time_delay(10);
-  abort();
-}
-#endif  // CONFIG_NIMBLE_CPP_DEBUG_ASSERT_ENABLED
 
 #endif  // CONFIG_BT_ENABLED

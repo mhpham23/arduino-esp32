@@ -18,7 +18,7 @@
 #ifndef NIMBLE_CPP_DEVICE_H_
 #define NIMBLE_CPP_DEVICE_H_
 
-#include "nimconfig.h"
+#include "sdkconfig.h"
 #if defined(CONFIG_BT_ENABLED)
 #ifndef CONFIG_IDF_TARGET_ESP32P4
 #include <esp_bt.h>

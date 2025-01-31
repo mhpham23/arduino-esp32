@@ -17,12 +17,10 @@
 
 #ifndef NIMBLE_CPP_ATTVALUE_H
 #define NIMBLE_CPP_ATTVALUE_H
-#include "nimconfig.h"
+#include "sdkconfig.h"
 #if defined(CONFIG_BT_ENABLED)
 
-#ifdef NIMBLE_CPP_ARDUINO_STRING_AVAILABLE
 #include <Arduino.h>
-#endif
 
 #include <string>
 #include <vector>
@@ -117,14 +115,12 @@ public:
      */
   BLEAttValue(const std::vector<uint8_t> vec, uint16_t max_len = BLE_ATT_ATTR_MAX_LEN) : BLEAttValue(&vec[0], vec.size(), max_len) {}
 
-#ifdef NIMBLE_CPP_ARDUINO_STRING_AVAILABLE
   /**
      * @brief Construct with an initial value from an Arduino String.
      * @param str An Arduino String containing to the initial value to set.
      * @param[in] max_len The max size in bytes that the value can be.
      */
   BLEAttValue(const String str, uint16_t max_len = BLE_ATT_ATTR_MAX_LEN) : BLEAttValue(reinterpret_cast<const uint8_t *>(str.c_str()), str.length(), max_len) {}
-#endif
 
   /** @brief Copy constructor */
   BLEAttValue(const BLEAttValue &source) {
@@ -365,12 +361,10 @@ public:
     return !(*this == source);
   }
 
-#ifdef NIMBLE_CPP_ARDUINO_STRING_AVAILABLE
   /** @brief Operator; Get the value as an Arduino String value. */
   operator String() const {
     return String(reinterpret_cast<char *>(m_attr_value));
   }
-#endif
 };
 
 #endif /*(CONFIG_BT_ENABLED) */

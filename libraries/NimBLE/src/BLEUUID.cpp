@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "nimconfig.h"
+#include "sdkconfig.h"
 #if defined(CONFIG_BT_ENABLED)
 
 #include "BLEUtils.h"
