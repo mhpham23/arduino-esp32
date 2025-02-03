@@ -19,7 +19,7 @@
 #define NIMBLE_CPP_UTILS_H_
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BT_ENABLED)
+#if defined(CONFIG_NIMBLE_ENABLED)
 #include <string>
 
 class BLEAddress;

@@ -16,7 +16,7 @@
  */
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BT_ENABLED)
+#if defined(CONFIG_NIMBLE_ENABLED)
 
 #include "nimble/nimble_npl.h"
 

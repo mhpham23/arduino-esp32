@@ -16,7 +16,7 @@
  */
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
+#if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
 
 #include "BLEService.h"
 #if CONFIG_BT_NIMBLE_EXT_ADV

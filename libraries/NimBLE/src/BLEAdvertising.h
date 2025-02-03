@@ -19,7 +19,7 @@
 #define NIMBLE_CPP_ADVERTISING_H_
 
 #include "sdkconfig.h"
-#if (defined(CONFIG_BT_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER) && !CONFIG_BT_NIMBLE_EXT_ADV)
+#if (defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER) && !CONFIG_BT_NIMBLE_EXT_ADV)
 
 #include "host/ble_gap.h"
 

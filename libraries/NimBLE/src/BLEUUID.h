@@ -19,7 +19,7 @@
 #define NIMBLE_CPP_UUID_H_
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BT_ENABLED)
+#if defined(CONFIG_NIMBLE_ENABLED)
 
 #include "host/ble_uuid.h"
 

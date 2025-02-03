@@ -19,7 +19,7 @@
 #define NIMBLE_CPP_CLIENT_H_
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_CENTRAL)
+#if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_CENTRAL)
 
 #include "host/ble_gap.h"
 

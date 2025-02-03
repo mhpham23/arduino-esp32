@@ -18,6 +18,9 @@
 #ifndef NIMBLECONNINFO_H_
 #define NIMBLECONNINFO_H_
 
+#include "sdkconfig.h"
+#ifdef CONFIG_NIMBLE_ENABLED
+
 #include "host/ble_gap.h"
 
 #include "BLEAddress.h"
@@ -104,4 +107,6 @@ private:
     m_desc = desc;
   }
 };
+
+#endif
 #endif

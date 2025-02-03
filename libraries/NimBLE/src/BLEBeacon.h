@@ -19,7 +19,7 @@
 #define NIMBLE_CPP_BEACON_H_
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER)
+#if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER)
 
 class BLEUUID;
 
