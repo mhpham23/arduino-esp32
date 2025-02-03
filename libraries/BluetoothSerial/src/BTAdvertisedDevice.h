@@ -8,10 +8,13 @@
 #ifndef __BTADVERTISEDDEVICE_H__
 #define __BTADVERTISEDDEVICE_H__
 
+#include "sdkconfig.h"
+#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BLUEDROID_ENABLED)
+
 #include "BTAddress.h"
 #include <string>
 
-class BTAdvertisedDevice {
+class [[deprecated("BluetoothSerial/Bluedroid support will be removed in 4.0.0")]] BTAdvertisedDevice {
 public:
   virtual ~BTAdvertisedDevice() = default;
 
@@ -27,7 +30,7 @@ public:
   virtual std::string toString() = 0;
 };
 
-class BTAdvertisedDeviceSet : public virtual BTAdvertisedDevice {
+class [[deprecated("BluetoothSerial/Bluedroid support will be removed in 4.0.0")]] BTAdvertisedDeviceSet : public virtual BTAdvertisedDevice {
 public:
   BTAdvertisedDeviceSet();
   //~BTAdvertisedDeviceSet() = default;
@@ -58,4 +61,5 @@ public:
   int8_t m_rssi;
 };
 
+#endif
 #endif

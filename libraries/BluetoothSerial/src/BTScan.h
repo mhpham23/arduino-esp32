@@ -8,6 +8,9 @@
 #ifndef __BTSCAN_H__
 #define __BTSCAN_H__
 
+#include "sdkconfig.h"
+#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BLUEDROID_ENABLED)
+
 #include <map>
 #include <string>
 #include <Print.h>
@@ -17,7 +20,7 @@
 class BTAdvertisedDevice;
 class BTAdvertisedDeviceSet;
 
-class BTScanResults {
+class [[deprecated("BluetoothSerial/Bluedroid support will be removed in 4.0.0")]] BTScanResults {
 public:
   virtual ~BTScanResults() = default;
 
@@ -26,7 +29,7 @@ public:
   virtual BTAdvertisedDevice *getDevice(int i) = 0;
 };
 
-class BTScanResultsSet : public BTScanResults {
+class [[deprecated("BluetoothSerial/Bluedroid support will be removed in 4.0.0")]] BTScanResultsSet : public BTScanResults {
 public:
   void dump(Print *print = nullptr);
   int getCount();
@@ -38,4 +41,5 @@ public:
   std::map<std::string, BTAdvertisedDeviceSet> m_vectorAdvertisedDevices;
 };
 
+#endif
 #endif

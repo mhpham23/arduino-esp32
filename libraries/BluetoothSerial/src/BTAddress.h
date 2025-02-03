@@ -19,7 +19,7 @@
  *
  * Every %BT device has a unique address which can be used to identify it and form connections.
  */
-class BTAddress {
+class [[deprecated("BluetoothSerial/Bluedroid support will be removed in 4.0.0")]] BTAddress {
 public:
   BTAddress();
   BTAddress(esp_bd_addr_t address);

@@ -34,7 +34,7 @@ typedef std::function<void()> KeyRequestCb;
 typedef std::function<void(boolean success)> AuthCompleteCb;
 typedef std::function<void(BTAdvertisedDevice *pAdvertisedDevice)> BTAdvertisedDeviceCb;
 
-class BluetoothSerial : public Stream {
+class [[deprecated("BluetoothSerial/Bluedroid support will be removed in 4.0.0")]] BluetoothSerial : public Stream {
 public:
   BluetoothSerial(void);
   ~BluetoothSerial(void);
