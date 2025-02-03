@@ -22,16 +22,17 @@
 #if SOC_BLE_SUPPORTED
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BLUEDROID_ENABLED)
+#if defined(CONFIG_BLUEDROID_ENABLED) || defined(CONFIG_NIMBLE_ENABLED)
 
 #include "BLEDescriptor.h"
 
+[[deprecated("This class is deprecated and will be removed in a future release. Use BLEDescriptor instead.")]]
 class BLE2901 : public BLEDescriptor {
 public:
   BLE2901();
   void setDescription(String desc);
 };  // BLE2901
 
-#endif /* CONFIG_BLUEDROID_ENABLED */
+#endif /* CONFIG_BLUEDROID_ENABLED || CONFIG_NIMBLE_ENABLED */
 #endif /* SOC_BLE_SUPPORTED */
 #endif /* COMPONENTS_CPP_UTILS_BLE2901_H_ */

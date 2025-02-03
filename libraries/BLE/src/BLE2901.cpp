@@ -19,9 +19,17 @@
 #if SOC_BLE_SUPPORTED
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BLUEDROID_ENABLED)
+#if defined(CONFIG_BLUEDROID_ENABLED) || defined(CONFIG_NIMBLE_ENABLED)
 
 #include "BLE2901.h"
+#include "BLEUUID.h"
+
+#ifdef CONFIG_NIMBLE_ENABLED
+#include "host/ble_att.h" // for Nimble
+#else
+#include "esp_gatt_defs.h" // for Bluedroid
+#define BLE_ATT_ATTR_MAX_LEN ESP_GATT_MAX_ATTR_LEN // for Bluedroid
+#endif
 
 BLE2901::BLE2901() : BLEDescriptor(BLEUUID((uint16_t)0x2901)) {}  // BLE2901
 
@@ -29,12 +37,12 @@ BLE2901::BLE2901() : BLEDescriptor(BLEUUID((uint16_t)0x2901)) {}  // BLE2901
  * @brief Set the Characteristic User Description
  */
 void BLE2901::setDescription(String userDesc) {
-  if (userDesc.length() > ESP_GATT_MAX_ATTR_LEN) {
-    log_e("Size %d too large, must be no bigger than %d", userDesc.length(), ESP_GATT_MAX_ATTR_LEN);
+  if (userDesc.length() > BLE_ATT_ATTR_MAX_LEN) {
+    log_e("Size %d too large, must be no bigger than %d", userDesc.length(), BLE_ATT_ATTR_MAX_LEN);
     return;
   }
   setValue(userDesc);
 }
 
-#endif
+#endif /* CONFIG_BLUEDROID_ENABLED || CONFIG_NIMBLE_ENABLED */
 #endif /* SOC_BLE_SUPPORTED */

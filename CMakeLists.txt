@@ -296,32 +296,32 @@ set(ARDUINO_LIBRARY_Zigbee_SRCS
 set(ARDUINO_LIBRARY_BLE_SRCS
   libraries/BLE/src/BLE2901.cpp
   libraries/BLE/src/BLE2902.cpp
-  libraries/BLE/src/BLE2904.cpp
-  libraries/BLE/src/BLEAddress.cpp
-  libraries/BLE/src/BLEAdvertisedDevice.cpp
-  libraries/BLE/src/BLEAdvertising.cpp
-  libraries/BLE/src/BLEBeacon.cpp
-  libraries/BLE/src/BLECharacteristic.cpp
-  libraries/BLE/src/BLECharacteristicMap.cpp
-  libraries/BLE/src/BLEClient.cpp
-  libraries/BLE/src/BLEDescriptor.cpp
-  libraries/BLE/src/BLEDescriptorMap.cpp
-  libraries/BLE/src/BLEDevice.cpp
-  libraries/BLE/src/BLEEddystoneTLM.cpp
-  libraries/BLE/src/BLEEddystoneURL.cpp
-  libraries/BLE/src/BLEExceptions.cpp
-  libraries/BLE/src/BLEHIDDevice.cpp
-  libraries/BLE/src/BLERemoteCharacteristic.cpp
-  libraries/BLE/src/BLERemoteDescriptor.cpp
-  libraries/BLE/src/BLERemoteService.cpp
-  libraries/BLE/src/BLEScan.cpp
-  libraries/BLE/src/BLESecurity.cpp
-  libraries/BLE/src/BLEServer.cpp
-  libraries/BLE/src/BLEService.cpp
-  libraries/BLE/src/BLEServiceMap.cpp
-  libraries/BLE/src/BLEUtils.cpp
-  libraries/BLE/src/BLEUUID.cpp
-  libraries/BLE/src/BLEValue.cpp
+  libraries/BLE/src/Bluedroid2904.cpp
+  libraries/BLE/src/BluedroidAddress.cpp
+  libraries/BLE/src/BluedroidAdvertisedDevice.cpp
+  libraries/BLE/src/BluedroidAdvertising.cpp
+  libraries/BLE/src/BluedroidBeacon.cpp
+  libraries/BLE/src/BluedroidCharacteristic.cpp
+  libraries/BLE/src/BluedroidCharacteristicMap.cpp
+  libraries/BLE/src/BluedroidClient.cpp
+  libraries/BLE/src/BluedroidDescriptor.cpp
+  libraries/BLE/src/BluedroidDescriptorMap.cpp
+  libraries/BLE/src/BluedroidDevice.cpp
+  libraries/BLE/src/BluedroidEddystoneTLM.cpp
+  libraries/BLE/src/BluedroidEddystoneURL.cpp
+  libraries/BLE/src/BluedroidExceptions.cpp
+  libraries/BLE/src/BluedroidHIDDevice.cpp
+  libraries/BLE/src/BluedroidRemoteCharacteristic.cpp
+  libraries/BLE/src/BluedroidRemoteDescriptor.cpp
+  libraries/BLE/src/BluedroidRemoteService.cpp
+  libraries/BLE/src/BluedroidScan.cpp
+  libraries/BLE/src/BluedroidSecurity.cpp
+  libraries/BLE/src/BluedroidServer.cpp
+  libraries/BLE/src/BluedroidService.cpp
+  libraries/BLE/src/BluedroidServiceMap.cpp
+  libraries/BLE/src/BluedroidUtils.cpp
+  libraries/BLE/src/BluedroidUUID.cpp
+  libraries/BLE/src/BluedroidValue.cpp
   libraries/BLE/src/FreeRTOS.cpp
   libraries/BLE/src/GeneralUtils.cpp
   )
@@ -355,6 +355,10 @@ if(NOT CONFIG_ARDUINO_SELECTIVE_COMPILATION OR CONFIG_ARDUINO_SELECTIVE_OpenThre
   if(IDF_TARGET STREQUAL "esp32c6" OR IDF_TARGET STREQUAL "esp32h2") # Sadly only this works
     list(APPEND requires openthread)
   endif()
+endif()
+
+if(IDF_TARGET NOT STREQUAL "esp32") # Remove this when Bluedroid support is dropped
+  list(APPEND requires esp_nimble)
 endif()
 
 if(IDF_TARGET STREQUAL "esp32p4")

@@ -10,6 +10,9 @@
 #include "soc/soc_caps.h"
 #if SOC_BLE_SUPPORTED
 
+#include "sdkconfig.h"
+#if defined(CONFIG_BLUEDROID_ENABLED)
+
 #include "BLEUUID.h"
 #include <BLEAdvertisedDevice.h>
 
@@ -57,5 +60,6 @@ private:
   } __attribute__((packed)) m_eddystoneData;
 };  // BLEEddystoneTLM
 
+#endif /* CONFIG_BLUEDROID_ENABLED */
 #endif /* SOC_BLE_SUPPORTED */
 #endif /* _BLEEddystoneTLM_H_ */
