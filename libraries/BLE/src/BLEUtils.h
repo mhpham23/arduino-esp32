@@ -54,6 +54,44 @@ public:
   static const char *searchEventTypeToString(esp_gap_search_evt_t searchEvt);
 };
 
-#endif /* CONFIG_BLUEDROID_ENABLED */
+#elif defined(CONFIG_NIMBLE_ENABLED)
+
+#include <string>
+
+class BLEAddress;
+
+/**
+ * @brief A structure to hold data for a task that is waiting for a response.
+ * @details This structure is used in conjunction with BLEUtils::taskWait() and BLEUtils::taskRelease().
+ * All items are optional, the m_pHandle will be set in taskWait().
+ */
+struct BLETaskData {
+  BLETaskData(void *pInstance = nullptr, int flags = 0, void *buf = nullptr);
+  ~BLETaskData();
+  void *m_pInstance{nullptr};
+  mutable int m_flags{0};
+  void *m_pBuf{nullptr};
+
+private:
+  mutable void *m_pHandle{nullptr};  // semaphore or task handle
+  friend class BLEUtils;
+};
+
+/**
+ * @brief A BLE Utility class with methods for debugging and general purpose use.
+ */
+class BLEUtils {
+public:
+  static const char *gapEventToString(uint8_t eventType);
+  static std::string dataToHexString(const uint8_t *source, uint8_t length);
+  static const char *advTypeToString(uint8_t advType);
+  static const char *returnCodeToString(int rc);
+  static BLEAddress generateAddr(bool nrpa);
+  static bool taskWait(const BLETaskData &taskData, uint32_t timeout);
+  static void taskRelease(const BLETaskData &taskData, int rc = 0);
+};
+
+#endif /* CONFIG_NIMBLE_ENABLED */
+
 #endif /* SOC_BLE_SUPPORTED */
 #endif /* COMPONENTS_CPP_UTILS_BLEUTILS_H_ */

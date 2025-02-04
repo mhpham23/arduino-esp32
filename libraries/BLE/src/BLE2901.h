@@ -26,8 +26,7 @@
 
 #include "BLEDescriptor.h"
 
-[[deprecated("This class is deprecated and will be removed in a future release. Use BLEDescriptor instead.")]]
-class BLE2901 : public BLEDescriptor {
+class [[deprecated("Use BLEDescriptor instead.")]] BLE2901 : public BLEDescriptor {
 public:
   BLE2901();
   void setDescription(String desc);

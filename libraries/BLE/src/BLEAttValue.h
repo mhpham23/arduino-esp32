@@ -367,5 +367,5 @@ public:
   }
 };
 
-#endif /*(CONFIG_BT_ENABLED) */
+#endif /*(CONFIG_NIMBLE_ENABLED) */
 #endif /* NIMBLE_CPP_ATTVALUE_H_ */

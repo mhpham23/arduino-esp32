@@ -1,8 +1,18 @@
 /*
- * BLE2904.h
+ * Copyright 2020-2024 Ryan Powell <ryan@nable-embedded.io> and
+ * esp-nimble-cpp, NimBLE-Arduino contributors.
  *
- *  Created on: Dec 23, 2017
- *      Author: kolban
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #ifndef COMPONENTS_CPP_UTILS_BLE2904_H_
@@ -11,17 +21,16 @@
 #if SOC_BLE_SUPPORTED
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BLUEDROID_ENABLED)
+#if defined(CONFIG_BLUEDROID_ENABLED) || (defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL))
 
 #include "BLEDescriptor.h"
 
 struct BLE2904_Data {
-  uint8_t m_format;
-  int8_t m_exponent;
-  uint16_t m_unit;  // See https://www.bluetooth.com/specifications/assigned-numbers/units
-  uint8_t m_namespace;
-  uint16_t m_description;
-
+  uint8_t m_format{0};
+  int8_t m_exponent{0};
+  uint16_t m_unit{0x2700};    // Unitless; See https://www.bluetooth.com/specifications/assigned-numbers/units
+  uint8_t m_namespace{1};     // 1 = Bluetooth SIG Assigned Numbers
+  uint16_t m_description{0};  // unknown description
 } __attribute__((packed));
 
 /**
@@ -34,7 +43,11 @@ struct BLE2904_Data {
  */
 class BLE2904 : public BLEDescriptor {
 public:
+#if defined(CONFIG_BLUEDROID_ENABLED)
   BLE2904();
+#else
+  BLE2904(BLECharacteristic *pChr = nullptr);
+#endif
   static const uint8_t FORMAT_BOOLEAN = 1;
   static const uint8_t FORMAT_UINT2 = 2;
   static const uint8_t FORMAT_UINT4 = 3;
@@ -62,6 +75,7 @@ public:
   static const uint8_t FORMAT_UTF8 = 25;
   static const uint8_t FORMAT_UTF16 = 26;
   static const uint8_t FORMAT_OPAQUE = 27;
+  static const uint8_t FORMAT_MEDASN1 = 28;
 
   void setDescription(uint16_t);
   void setExponent(int8_t exponent);
@@ -70,9 +84,10 @@ public:
   void setUnit(uint16_t unit);
 
 private:
-  BLE2904_Data m_data;
+  friend class BLECharacteristic;
+  BLE2904_Data m_data{};
 };  // BLE2904
 
-#endif /* CONFIG_BLUEDROID_ENABLED */
+#endif /* CONFIG_BLUEDROID_ENABLED || (CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL) */
 #endif /* SOC_BLE_SUPPORTED */
 #endif /* COMPONENTS_CPP_UTILS_BLE2904_H_ */

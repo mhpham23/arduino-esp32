@@ -1,8 +1,18 @@
 /*
- * BLERemoteCharacteristic.h
+ * Copyright 2020-2024 Ryan Powell <ryan@nable-embedded.io> and
+ * esp-nimble-cpp, NimBLE-Arduino contributors.
  *
- *  Created on: Jul 8, 2017
- *      Author: kolban
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #ifndef COMPONENTS_CPP_UTILS_BLEREMOTECHARACTERISTIC_H_
@@ -11,7 +21,74 @@
 #if SOC_BLE_SUPPORTED
 
 #include "sdkconfig.h"
-#if defined(CONFIG_BLUEDROID_ENABLED)
+#if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_CENTRAL)
+
+#include "BLERemoteValueAttribute.h"
+#include <vector>
+#include <functional>
+
+class BLEUUID;
+class BLERemoteService;
+class BLERemoteDescriptor;
+struct BLEDescriptorFilter;
+
+/**
+ * @brief A model of a remote BLE characteristic.
+ */
+class BLERemoteCharacteristic : public BLERemoteValueAttribute {
+public:
+  std::string toString() const;
+  const BLERemoteService *getRemoteService() const;
+  void deleteDescriptors() const;
+  size_t deleteDescriptor(const BLEUUID &uuid) const;
+  bool canBroadcast() const;
+  bool canRead() const;
+  bool canWriteNoResponse() const;
+  bool canWrite() const;
+  bool canNotify() const;
+  bool canIndicate() const;
+  bool canWriteSigned() const;
+  bool hasExtendedProps() const;
+  BLEClient *getClient() const override;
+
+  typedef std::function<void(BLERemoteCharacteristic *pBLERemoteCharacteristic, uint8_t *pData, size_t length, bool isNotify)> notify_callback;
+
+  bool subscribe(bool notifications = true, const notify_callback notifyCallback = nullptr, bool response = true) const;
+  bool unsubscribe(bool response = true) const;
+
+  std::vector<BLERemoteDescriptor *>::iterator begin() const;
+  std::vector<BLERemoteDescriptor *>::iterator end() const;
+  BLERemoteDescriptor *getDescriptor(const BLEUUID &uuid) const;
+  const std::vector<BLERemoteDescriptor *> &getDescriptors(bool refresh = false) const;
+
+private:
+  friend class BLEClient;
+  friend class BLERemoteService;
+
+  BLERemoteCharacteristic(const BLERemoteService *pRemoteService, const ble_gatt_chr *chr);
+  ~BLERemoteCharacteristic();
+
+  bool setNotify(uint16_t val, notify_callback notifyCallback = nullptr, bool response = true) const;
+  bool retrieveDescriptors(BLEDescriptorFilter *filter = nullptr) const;
+
+  static int descriptorDiscCB(uint16_t connHandle, const ble_gatt_error *error, uint16_t chrHandle, const ble_gatt_dsc *dsc, void *arg);
+
+  const BLERemoteService *m_pRemoteService{nullptr};
+  uint8_t m_properties{0};
+  mutable notify_callback m_notifyCallback{nullptr};
+  mutable std::vector<BLERemoteDescriptor *> m_vDescriptors{};
+
+};  // BLERemoteCharacteristic
+
+#elif defined(CONFIG_BLUEDROID_ENABLED)
+
+/*
+ * BLERemoteCharacteristic.h
+ *
+ *  Created on: Jul 8, 2017
+ *      Author: kolban
+ */
+
 #include <functional>
 
 #include <esp_gattc_api.h>
@@ -86,5 +163,6 @@ private:
 };  // BLERemoteCharacteristic
 
 #endif /* CONFIG_BLUEDROID_ENABLED */
+
 #endif /* SOC_BLE_SUPPORTED */
 #endif /* COMPONENTS_CPP_UTILS_BLEREMOTECHARACTERISTIC_H_ */

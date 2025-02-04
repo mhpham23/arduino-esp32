@@ -155,5 +155,5 @@ public:
   virtual void onScanRequest(BLEExtAdvertising *pAdv, uint8_t instId, BLEAddress addr);
 };  // BLEExtAdvertisingCallbacks
 
-#endif  // CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER && CONFIG_BT_NIMBLE_EXT_ADV
+#endif  // CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER && CONFIG_BT_NIMBLE_EXT_ADV
 #endif  // NIMBLE_CPP_EXTADVERTISING_H_
