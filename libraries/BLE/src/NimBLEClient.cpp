@@ -1259,4 +1259,4 @@ void BLEClientCallbacks::onPhyUpdate(BLEClient *pClient, uint8_t txPhy, uint8_t 
 }  // onPhyUpdate
 #endif
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_CENTRAL */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_CENTRAL */

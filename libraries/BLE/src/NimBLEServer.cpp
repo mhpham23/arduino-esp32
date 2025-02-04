@@ -1016,4 +1016,4 @@ void BLEServerCallbacks::onPhyUpdate(BLEConnInfo &connInfo, uint8_t txPhy, uint8
 }  // onPhyUpdate
 #endif
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */

@@ -329,4 +329,4 @@ BLEUUID::operator std::string() const {
   return ble_uuid_to_str(&m_uuid.u, buf);
 }  // operator std::string
 
-#endif /* CONFIG_BT_ENABLED */
+#endif /* CONFIG_NIMBLE_ENABLED */

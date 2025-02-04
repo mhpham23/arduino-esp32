@@ -210,4 +210,4 @@ int BLERemoteValueAttribute::onReadCB(uint16_t conn_handle, const ble_gatt_error
   return rc;
 }  // onReadCB
 
-#endif  // CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_CENTRAL
+#endif  // CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_CENTRAL

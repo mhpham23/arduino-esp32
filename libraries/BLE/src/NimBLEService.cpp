@@ -374,4 +374,4 @@ bool BLEService::isStarted() const {
   return m_pSvcDef->type > 0;
 }  // isStarted
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */

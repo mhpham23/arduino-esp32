@@ -1194,4 +1194,4 @@ std::string BLEDevice::toString() {
   return getAddress().toString();
 }  // toString
 
-#endif  // CONFIG_BT_ENABLED
+#endif  // CONFIG_NIMBLE_ENABLED

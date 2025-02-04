@@ -408,4 +408,4 @@ void BLECharacteristicCallbacks::onSubscribe(BLECharacteristic *pCharacteristic,
   log_d("BLECharacteristicCallbacks", "onSubscribe: default");
 }
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */

@@ -782,4 +782,4 @@ const std::vector<uint8_t>::const_iterator BLEAdvertisedDevice::end() const {
   return m_payload.cend();
 }
 
-#endif /* CONFIG_BT_ENABLED  && CONFIG_BT_NIMBLE_ROLE_CENTRAL */
+#endif /* CONFIG_NIMBLE_ENABLED  && CONFIG_BT_NIMBLE_ROLE_CENTRAL */

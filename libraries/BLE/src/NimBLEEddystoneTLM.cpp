@@ -211,4 +211,4 @@ void BLEEddystoneTLM::setTime(uint32_t tmil) {
   m_eddystoneData.tmil = tmil;
 }  // setTime
 
-#endif  // CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER
+#endif  // CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER

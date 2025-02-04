@@ -535,4 +535,4 @@ void BLEScanCallbacks::onScanEnd(const BLEScanResults &results, int reason) {
   log_d(CB_TAG, "Scan ended; reason %d, num results: %d", reason, results.getCount());
 }
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_OBSERVER */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_OBSERVER */

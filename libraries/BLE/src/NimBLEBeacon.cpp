@@ -137,4 +137,4 @@ void BLEBeacon::setSignalPower(int8_t signalPower) {
   m_beaconData.signalPower = signalPower;
 }  // setSignalPower
 
-#endif  // CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER
+#endif  // CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER

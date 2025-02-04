@@ -289,4 +289,4 @@ std::string BLERemoteService::toString() const {
   return res;
 }  // toString
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_CENTRAL */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_CENTRAL */

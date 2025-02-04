@@ -148,4 +148,4 @@ uint8_t BLEAttValue::operator[](int pos) const {
   return m_attr_value[pos];
 }
 
-#endif  // CONFIG_BT_ENABLED
+#endif  // CONFIG_NIMBLE_ENABLED

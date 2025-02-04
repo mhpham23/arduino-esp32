@@ -70,4 +70,4 @@ void BLE2904::setUnit(uint16_t unit) {
   setValue(m_data);
 }  // setUnit
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */

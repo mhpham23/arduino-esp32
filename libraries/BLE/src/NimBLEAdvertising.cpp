@@ -595,4 +595,4 @@ bool BLEAdvertising::setServiceData(const BLEUUID &uuid, const std::string &data
   return setServiceData(uuid, reinterpret_cast<const uint8_t *>(data.data()), data.length());
 }  // setServiceData
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER  && !CONFIG_BT_NIMBLE_EXT_ADV */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER  && !CONFIG_BT_NIMBLE_EXT_ADV */

@@ -147,4 +147,4 @@ void BLEDescriptorCallbacks::onWrite(BLEDescriptor *pDescriptor, BLEConnInfo &co
   log_d("BLEDescriptorCallbacks", "onWrite: default");
 }  // onWrite
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */

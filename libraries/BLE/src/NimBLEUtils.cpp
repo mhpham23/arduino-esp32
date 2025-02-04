@@ -432,4 +432,4 @@ BLEAddress BLEUtils::generateAddr(bool nrpa) {
   return BLEAddress{addr};
 }  // generateAddr
 
-#endif  // CONFIG_BT_ENABLED
+#endif  // CONFIG_NIMBLE_ENABLED

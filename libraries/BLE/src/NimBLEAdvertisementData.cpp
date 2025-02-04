@@ -547,4 +547,4 @@ std::string BLEAdvertisementData::toString() const {
   return str;
 }  // toString
 
-#endif  // CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER && !CONFIG_BT_NIMBLE_EXT_ADV
+#endif  // CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_BROADCASTER && !CONFIG_BT_NIMBLE_EXT_ADV

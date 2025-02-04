@@ -338,4 +338,4 @@ BLEService *BLEHIDDevice::getBatteryService() {
   return m_batterySvc;
 }  // getBatteryService
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */
+#endif /* CONFIG_NIMBLE_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */
