@@ -25,10 +25,10 @@
 #include "BLEUUID.h"
 
 #ifdef CONFIG_NIMBLE_ENABLED
-#include "host/ble_att.h" // for Nimble
+#include "host/ble_att.h"  // for Nimble
 #else
-#include "esp_gatt_defs.h" // for Bluedroid
-#define BLE_ATT_ATTR_MAX_LEN ESP_GATT_MAX_ATTR_LEN // for Bluedroid
+#include "esp_gatt_defs.h"                          // for Bluedroid
+#define BLE_ATT_ATTR_MAX_LEN ESP_GATT_MAX_ATTR_LEN  // for Bluedroid
 #endif
 
 BLE2901::BLE2901() : BLEDescriptor(BLEUUID((uint16_t)0x2901)) {}  // BLE2901

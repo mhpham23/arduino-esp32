@@ -76,10 +76,12 @@ public:
   bool notify(uint16_t connHandle = BLE_HS_CONN_HANDLE_NONE) const;
   bool notify(const uint8_t *value, size_t length, uint16_t connHandle = BLE_HS_CONN_HANDLE_NONE) const;
 
-  BLEDescriptor *
-    createDescriptor(const char *uuid, uint32_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN);
-  BLEDescriptor *
-    createDescriptor(const BLEUUID &uuid, uint32_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN);
+  BLEDescriptor *createDescriptor(
+    const char *uuid, uint32_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN
+  );
+  BLEDescriptor *createDescriptor(
+    const BLEUUID &uuid, uint32_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN
+  );
   BLE2904 *create2904();
   BLEDescriptor *getDescriptorByUUID(const char *uuid) const;
   BLEDescriptor *getDescriptorByUUID(const BLEUUID &uuid) const;

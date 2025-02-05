@@ -296,7 +296,6 @@ private:
  *      Author: kolban
  */
 
-
 #include <esp_gap_ble_api.h>  // ESP32 BLE
 #include <esp_gattc_api.h>    // ESP32 BLE
 #include <map>                // Part of C++ STL

@@ -191,9 +191,7 @@ void BLEServer::start() {
     if (svc->getRemoved() == 0) {
       rc = ble_gatts_find_svc(svc->getUUID().getBase(), &svc->m_handle);
       if (rc != 0) {
-        log_w(
-          LOG_TAG, "GATT Server started without service: %s, Service %s", svc->getUUID().toString().c_str(), svc->isStarted() ? "missing" : "not started"
-        );
+        log_w(LOG_TAG, "GATT Server started without service: %s, Service %s", svc->getUUID().toString().c_str(), svc->isStarted() ? "missing" : "not started");
         continue;  // Skip this service as it was not started
       }
     }
