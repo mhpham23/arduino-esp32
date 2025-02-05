@@ -9,7 +9,7 @@
  *  Fixes based on EddystoneTLM frame specification https://github.com/google/eddystone/blob/master/eddystone-tlm/tlm-plain.md
  *
  */
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_BLUEDROID_ENABLED)
 #include <string.h>
 #include <stdio.h>

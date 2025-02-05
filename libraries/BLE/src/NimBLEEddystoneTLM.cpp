@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER)
 
 #include "BLEEddystoneTLM.h"

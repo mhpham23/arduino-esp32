@@ -18,7 +18,7 @@
 #ifndef NIMBLE_CPP_EXTADVERTISING_H_
 #define NIMBLE_CPP_EXTADVERTISING_H_
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER) && CONFIG_BT_NIMBLE_EXT_ADV
 
 #include "host/ble_gap.h"

@@ -7,13 +7,12 @@
 #include "soc/soc_caps.h"
 #if SOC_BLE_SUPPORTED
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_BLUEDROID_ENABLED)
 #include <sstream>
 #include <string.h>
 #include <iomanip>
 #include <stdlib.h>
-#include "sdkconfig.h"
 #include <esp_err.h>
 #include "BLECharacteristic.h"
 #include "BLEService.h"

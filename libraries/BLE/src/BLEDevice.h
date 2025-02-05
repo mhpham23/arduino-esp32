@@ -20,7 +20,7 @@
 #include "soc/soc_caps.h"
 #if SOC_BLE_SUPPORTED
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_NIMBLE_ENABLED)
 #ifndef CONFIG_IDF_TARGET_ESP32P4
 #include <esp_bt.h>

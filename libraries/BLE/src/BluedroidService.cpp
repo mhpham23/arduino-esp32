@@ -10,7 +10,7 @@
 #include "soc/soc_caps.h"
 #if SOC_BLE_SUPPORTED
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_BLUEDROID_ENABLED)
 #include <esp_err.h>
 #include <esp_gatts_api.h>

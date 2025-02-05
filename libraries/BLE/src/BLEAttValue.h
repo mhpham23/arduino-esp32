@@ -17,7 +17,7 @@
 
 #ifndef NIMBLE_CPP_ATTVALUE_H
 #define NIMBLE_CPP_ATTVALUE_H
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_NIMBLE_ENABLED)
 
 #include <Arduino.h>

@@ -10,7 +10,7 @@
 #include "soc/soc_caps.h"
 #if SOC_BLE_SUPPORTED
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_BLUEDROID_ENABLED) || defined(CONFIG_NIMBLE_ENABLED)
 
 #include "BLEDescriptor.h"

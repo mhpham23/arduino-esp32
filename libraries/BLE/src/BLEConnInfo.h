@@ -18,7 +18,7 @@
 #ifndef NIMBLECONNINFO_H_
 #define NIMBLECONNINFO_H_
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #ifdef CONFIG_NIMBLE_ENABLED
 
 #include "host/ble_gap.h"

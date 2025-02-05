@@ -32,7 +32,7 @@
 #define HID_BARCODE         0x03C8
 #define HID_BRAILLE_DISPLAY 0x03C9
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER) && defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
 
 #include <stdint.h>

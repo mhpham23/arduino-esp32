@@ -18,9 +18,10 @@
 #ifndef NIMBLE_LOCAL_VALUE_ATTRIBUTE_H_
 #define NIMBLE_LOCAL_VALUE_ATTRIBUTE_H_
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
 
+#include "nimconfig_rename.h"
 #include "host/ble_hs.h"
 
 /****  FIX COMPILATION ****/

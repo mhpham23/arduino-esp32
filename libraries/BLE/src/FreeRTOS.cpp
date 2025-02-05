@@ -11,7 +11,7 @@
 #include <sstream>
 #include <iomanip>
 #include "RTOS.h"
-#include "sdkconfig.h"
+#include "btconfig.h"
 #include "esp32-hal-log.h"
 
 /**

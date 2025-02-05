@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 #if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER) && CONFIG_BT_NIMBLE_EXT_ADV
 
 #include "services/gap/ble_svc_gap.h"

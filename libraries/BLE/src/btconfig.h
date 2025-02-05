@@ -1,0 +1,101 @@
+/*
+ * Copyright 2020-2024 Ryan Powell <ryan@nable-embedded.io> and
+ * esp-nimble-cpp, NimBLE-Arduino contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * For ESP-IDF compatibility
+ * Some versions of ESP-IDF used the config name format "CONFIG_NIMBLE_".
+ * This converts them to "CONFIG_BT_NIMBLE_" format used in the latest IDF.
+ * Also some config names are different between NimBLE and ESP-IDF.
+ */
+
+#include "sdkconfig.h"
+
+#if defined(CONFIG_NIMBLE_ENABLED) && !defined(CONFIG_BT_NIMBLE_ENABLED)
+#define CONFIG_BT_NIMBLE_ENABLED
+#endif
+
+#if defined(CONFIG_NIMBLE_ROLE_OBSERVER) && !defined(CONFIG_BT_NIMBLE_ROLE_OBSERVER)
+#define CONFIG_BT_NIMBLE_ROLE_OBSERVER
+#endif
+
+#if defined(CONFIG_NIMBLE_ROLE_BROADCASTER) && !defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER)
+#define CONFIG_BT_NIMBLE_ROLE_BROADCASTER
+#endif
+
+#if defined(CONFIG_NIMBLE_ROLE_CENTRAL) && !defined(CONFIG_BT_NIMBLE_ROLE_CENTRAL)
+#define CONFIG_BT_NIMBLE_ROLE_CENTRAL
+#endif
+
+#if defined(CONFIG_NIMBLE_ROLE_PERIPHERAL) && !defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
+#define CONFIG_BT_NIMBLE_ROLE_PERIPHERAL
+#endif
+
+#if defined(CONFIG_NIMBLE_DEBUG) && !defined(CONFIG_BT_NIMBLE_DEBUG)
+#define CONFIG_BT_NIMBLE_DEBUG
+#endif
+
+#if defined(CONFIG_SCAN_DUPLICATE_BY_DEVICE_ADDR) && !defined(CONFIG_BTDM_SCAN_DUPL_TYPE_DEVICE)
+#define CONFIG_BTDM_SCAN_DUPL_TYPE_DEVICE CONFIG_SCAN_DUPLICATE_BY_DEVICE_ADDR
+#endif
+
+#if defined(CONFIG_SCAN_DUPLICATE_BY_ADV_DATA ) && !defined(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA)
+#define CONFIG_BTDM_SCAN_DUPL_TYPE_DATA CONFIG_SCAN_DUPLICATE_BY_ADV_DATA
+#endif
+
+#if defined(CONFIG_SCAN_DUPLICATE_BY_ADV_DATA_AND_DEVICE_ADDR) && !defined(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE)
+#define CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE CONFIG_SCAN_DUPLICATE_BY_ADV_DATA_AND_DEVICE_ADDR
+#endif
+
+#if defined(CONFIG_SCAN_DUPLICATE_TYPE) && !defined(CONFIG_BTDM_SCAN_DUPL_TYPE)
+#define CONFIG_BTDM_SCAN_DUPL_TYPE CONFIG_SCAN_DUPLICATE_TYPE
+#endif
+
+#if defined(CONFIG_BT_CTRL_SCAN_DUPL_TYPE) && !defined(CONFIG_BTDM_SCAN_DUPL_TYPE)
+#define CONFIG_BTDM_SCAN_DUPL_TYPE CONFIG_BT_CTRL_SCAN_DUPL_TYPE
+#endif
+
+#if defined(CONFIG_DUPLICATE_SCAN_CACHE_SIZE) && !defined(CONFIG_BTDM_SCAN_DUPL_CACHE_SIZE)
+#define CONFIG_BTDM_SCAN_DUPL_CACHE_SIZE CONFIG_DUPLICATE_SCAN_CACHE_SIZE
+#endif
+
+#if defined(CONFIG_BT_CTRL_SCAN_DUPL_CACHE_SIZE) && !defined(CONFIG_BTDM_SCAN_DUPL_CACHE_SIZE)
+#define CONFIG_BTDM_SCAN_DUPL_CACHE_SIZE CONFIG_BT_CTRL_SCAN_DUPL_CACHE_SIZE
+#endif
+
+#if defined(CONFIG_NIMBLE_MAX_CONNECTIONS ) && !defined(CONFIG_BT_NIMBLE_MAX_CONNECTIONS)
+#define CONFIG_BT_NIMBLE_MAX_CONNECTIONS CONFIG_NIMBLE_MAX_CONNECTIONS
+#endif
+
+#if defined(CONFIG_BT_NIMBLE_EXT_ADV_MAX_SIZE) && !defined(CONFIG_BT_NIMBLE_MAX_EXT_ADV_DATA_LEN)
+#define CONFIG_BT_NIMBLE_MAX_EXT_ADV_DATA_LEN CONFIG_BT_NIMBLE_EXT_ADV_MAX_SIZE
+#endif
+
+#if !defined(CONFIG_BTDM_BLE_SCAN_DUPL) && defined(CONFIG_BT_CTRL_BLE_SCAN_DUPL)
+#define CONFIG_BTDM_BLE_SCAN_DUPL CONFIG_BT_CTRL_BLE_SCAN_DUPL
+#endif
+
+#if !defined(CONFIG_BTDM_SCAN_DUPL_TYPE_DEVICE) && defined(CONFIG_BT_CTRL_SCAN_DUPL_TYPE_DEVICE)
+#define CONFIG_BTDM_SCAN_DUPL_TYPE_DEVICE CONFIG_BT_CTRL_SCAN_DUPL_TYPE_DEVICE
+#endif
+
+#if !defined(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA) && defined(CONFIG_BT_CTRL_SCAN_DUPL_TYPE_DATA)
+#define CONFIG_BTDM_SCAN_DUPL_TYPE_DATA CONFIG_BT_CTRL_SCAN_DUPL_TYPE_DATA
+#endif
+
+#if !defined(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE) && defined(CONFIG_BT_CTRL_SCAN_DUPL_TYPE_DATA_DEVICE)
+#define CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE CONFIG_BT_CTRL_SCAN_DUPL_TYPE_DATA_DEVICE
+#endif

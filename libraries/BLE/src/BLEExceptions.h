@@ -10,7 +10,7 @@
 #include "soc/soc_caps.h"
 #if SOC_BLE_SUPPORTED
 
-#include "sdkconfig.h"
+#include "btconfig.h"
 
 #if CONFIG_CXX_EXCEPTIONS != 1
 #error "C++ exception handling must be enabled within make menuconfig. See Compiler Options > Enable C++ Exceptions."
