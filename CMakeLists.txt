@@ -324,6 +324,29 @@ set(ARDUINO_LIBRARY_BLE_SRCS
   libraries/BLE/src/BluedroidValue.cpp
   libraries/BLE/src/FreeRTOS.cpp
   libraries/BLE/src/GeneralUtils.cpp
+  libraries/BLE/src/NimBLE2904.cpp
+  libraries/BLE/src/NimBLEAddress.cpp
+  libraries/BLE/src/NimBLEAdvertisedDevice.cpp
+  libraries/BLE/src/NimBLEAdvertisementData.cpp
+  libraries/BLE/src/NimBLEAdvertising.cpp
+  libraries/BLE/src/NimBLEAttValue.cpp
+  libraries/BLE/src/NimBLEBeacon.cpp
+  libraries/BLE/src/NimBLECharacteristic.cpp
+  libraries/BLE/src/NimBLEClient.cpp
+  libraries/BLE/src/NimBLEDescriptor.cpp
+  libraries/BLE/src/NimBLEDevice.cpp
+  libraries/BLE/src/NimBLEEddystoneTLM.cpp
+  libraries/BLE/src/NimBLEExtAdvertising.cpp
+  libraries/BLE/src/NimBLEHIDDevice.cpp
+  libraries/BLE/src/NimBLERemoteCharacteristic.cpp
+  libraries/BLE/src/NimBLERemoteDescriptor.cpp
+  libraries/BLE/src/NimBLERemoteService.cpp
+  libraries/BLE/src/NimBLERemoteValueAttribute.cpp
+  libraries/BLE/src/NimBLEScan.cpp
+  libraries/BLE/src/NimBLEServer.cpp
+  libraries/BLE/src/NimBLEService.cpp
+  libraries/BLE/src/NimBLEUtils.cpp
+  libraries/BLE/src/NimBLEUUID.cpp
   )
 
 set(ARDUINO_LIBRARIES_SRCS)
