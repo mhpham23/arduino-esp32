@@ -104,7 +104,8 @@ public:
   const std::vector<uint8_t>::const_iterator end() const;
 
   // Compatibility with Bluedroid
-  [[deprecated]] ble_frame_type_t getFrameType() const;
+  [[deprecated]]
+  ble_frame_type_t getFrameType() const;
 
   /**
      * @brief A template to convert the service data to <type\>.
