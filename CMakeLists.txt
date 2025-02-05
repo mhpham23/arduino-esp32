@@ -380,7 +380,7 @@ if(NOT CONFIG_ARDUINO_SELECTIVE_COMPILATION OR CONFIG_ARDUINO_SELECTIVE_OpenThre
   endif()
 endif()
 
-if(IDF_TARGET NOT STREQUAL "esp32") # Remove this when Bluedroid support is dropped
+if(NOT IDF_TARGET STREQUAL "esp32") # Remove this when Bluedroid support is dropped
   list(APPEND requires esp_nimble)
 endif()
 
