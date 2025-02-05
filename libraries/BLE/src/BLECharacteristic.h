@@ -42,12 +42,25 @@ class BLE2904;
  */
 class BLECharacteristic : public BLELocalValueAttribute {
 public:
+  static const uint32_t PROPERTY_READ = BLE_GATT_CHR_F_READ;
+  static const uint32_t PROPERTY_READ_ENC = BLE_GATT_CHR_F_READ_ENC;
+  static const uint32_t PROPERTY_READ_AUTHEN = BLE_GATT_CHR_F_READ_AUTHEN;
+  static const uint32_t PROPERTY_READ_AUTHOR = BLE_GATT_CHR_F_READ_AUTHOR;
+  static const uint32_t PROPERTY_WRITE = BLE_GATT_CHR_F_WRITE;
+  static const uint32_t PROPERTY_WRITE_NR = BLE_GATT_CHR_F_WRITE_NO_RSP;
+  static const uint32_t PROPERTY_WRITE_ENC = BLE_GATT_CHR_F_WRITE_ENC;
+  static const uint32_t PROPERTY_WRITE_AUTHEN = BLE_GATT_CHR_F_WRITE_AUTHEN;
+  static const uint32_t PROPERTY_WRITE_AUTHOR = BLE_GATT_CHR_F_WRITE_AUTHOR;
+  static const uint32_t PROPERTY_BROADCAST = BLE_GATT_CHR_F_BROADCAST;
+  static const uint32_t PROPERTY_NOTIFY = BLE_GATT_CHR_F_NOTIFY;
+  static const uint32_t PROPERTY_INDICATE = BLE_GATT_CHR_F_INDICATE;
+
   BLECharacteristic(
-    const char *uuid, uint16_t properties = NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN,
+    const char *uuid, uint16_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN,
     BLEService *pService = nullptr
   );
   BLECharacteristic(
-    const BLEUUID &uuid, uint16_t properties = NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN,
+    const BLEUUID &uuid, uint16_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN,
     BLEService *pService = nullptr
   );
 
@@ -64,9 +77,9 @@ public:
   bool notify(const uint8_t *value, size_t length, uint16_t connHandle = BLE_HS_CONN_HANDLE_NONE) const;
 
   BLEDescriptor *
-    createDescriptor(const char *uuid, uint32_t properties = NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN);
+    createDescriptor(const char *uuid, uint32_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN);
   BLEDescriptor *
-    createDescriptor(const BLEUUID &uuid, uint32_t properties = NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN);
+    createDescriptor(const BLEUUID &uuid, uint32_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t maxLen = BLE_ATT_ATTR_MAX_LEN);
   BLE2904 *create2904();
   BLEDescriptor *getDescriptorByUUID(const char *uuid) const;
   BLEDescriptor *getDescriptorByUUID(const BLEUUID &uuid) const;

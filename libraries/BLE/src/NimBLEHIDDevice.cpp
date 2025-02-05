@@ -51,16 +51,16 @@ BLEHIDDevice::BLEHIDDevice(BLEServer *server) {
   m_batterySvc = server->createService(batterySvcUuid);
 
   // Mandatory characteristic for device info service
-  m_pnpChr = m_deviceInfoSvc->createCharacteristic(pnpCharUuid, NIMBLE_PROPERTY::READ);
+  m_pnpChr = m_deviceInfoSvc->createCharacteristic(pnpCharUuid, BLECharacteristic::PROPERTY_READ);
 
   // Mandatory characteristics for HID service
-  m_hidInfoChr = m_hidSvc->createCharacteristic(hidInfoCharUuid, NIMBLE_PROPERTY::READ);
-  m_reportMapChr = m_hidSvc->createCharacteristic(reportMapCharUuid, NIMBLE_PROPERTY::READ);
-  m_hidControlChr = m_hidSvc->createCharacteristic(hidControlCharUuid, NIMBLE_PROPERTY::WRITE_NR);
-  m_protocolModeChr = m_hidSvc->createCharacteristic(protocolModeCharUuid, NIMBLE_PROPERTY::WRITE_NR | NIMBLE_PROPERTY::READ);
+  m_hidInfoChr = m_hidSvc->createCharacteristic(hidInfoCharUuid, BLECharacteristic::PROPERTY_READ);
+  m_reportMapChr = m_hidSvc->createCharacteristic(reportMapCharUuid, BLECharacteristic::PROPERTY_READ);
+  m_hidControlChr = m_hidSvc->createCharacteristic(hidControlCharUuid, BLECharacteristic::PROPERTY_WRITE_NR);
+  m_protocolModeChr = m_hidSvc->createCharacteristic(protocolModeCharUuid, BLECharacteristic::PROPERTY_WRITE_NR | BLECharacteristic::PROPERTY_READ);
 
   // Mandatory battery level characteristic with notification and presence descriptor
-  m_batteryLevelChr = m_batterySvc->createCharacteristic(batteryLevelCharUuid, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
+  m_batteryLevelChr = m_batterySvc->createCharacteristic(batteryLevelCharUuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
   BLE2904 *batteryLevelDescriptor = m_batteryLevelChr->create2904();
   batteryLevelDescriptor->setFormat(BLE2904::FORMAT_UINT8);
   batteryLevelDescriptor->setUnit(0x27ad);  // percentage
@@ -95,7 +95,7 @@ void BLEHIDDevice::startServices() {
  */
 bool BLEHIDDevice::setManufacturer(const std::string &name) {
   if (m_manufacturerChr == nullptr) {
-    m_manufacturerChr = m_deviceInfoSvc->createCharacteristic(m_manufacturerChrUuid, NIMBLE_PROPERTY::READ);
+    m_manufacturerChr = m_deviceInfoSvc->createCharacteristic(m_manufacturerChrUuid, BLECharacteristic::PROPERTY_READ);
   }
 
   if (m_manufacturerChr) {
@@ -181,8 +181,8 @@ BLECharacteristic *BLEHIDDevice::locateReportCharacteristicByIdAndType(uint8_t r
 BLECharacteristic *BLEHIDDevice::getInputReport(uint8_t reportId) {
   BLECharacteristic *inputReportChr = locateReportCharacteristicByIdAndType(reportId, 0x01);
   if (inputReportChr == nullptr) {
-    inputReportChr = m_hidSvc->createCharacteristic(inputReportChrUuid, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY | NIMBLE_PROPERTY::READ_ENC);
-    BLEDescriptor *inputReportDsc = inputReportChr->createDescriptor(featureReportDscUuid, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::READ_ENC);
+    inputReportChr = m_hidSvc->createCharacteristic(inputReportChrUuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY | BLECharacteristic::PROPERTY_READ_ENC);
+    BLEDescriptor *inputReportDsc = inputReportChr->createDescriptor(featureReportDscUuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_READ_ENC);
 
     uint8_t desc1_val[] = {reportId, 0x01};
     inputReportDsc->setValue(desc1_val, 2);
@@ -202,10 +202,10 @@ BLECharacteristic *BLEHIDDevice::getOutputReport(uint8_t reportId) {
   BLECharacteristic *outputReportChr = locateReportCharacteristicByIdAndType(reportId, 0x02);
   if (outputReportChr == nullptr) {
     outputReportChr = m_hidSvc->createCharacteristic(
-      inputReportChrUuid, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR | NIMBLE_PROPERTY::READ_ENC | NIMBLE_PROPERTY::WRITE_ENC
+      inputReportChrUuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR | BLECharacteristic::PROPERTY_READ_ENC | BLECharacteristic::PROPERTY_WRITE_ENC
     );
     BLEDescriptor *outputReportDsc = outputReportChr->createDescriptor(
-      featureReportDscUuid, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::READ_ENC | NIMBLE_PROPERTY::WRITE_ENC
+      featureReportDscUuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_READ_ENC | BLECharacteristic::PROPERTY_WRITE_ENC
     );
     uint8_t desc1_val[] = {reportId, 0x02};
     outputReportDsc->setValue(desc1_val, 2);
@@ -225,10 +225,10 @@ BLECharacteristic *BLEHIDDevice::getFeatureReport(uint8_t reportId) {
   BLECharacteristic *featureReportChr = locateReportCharacteristicByIdAndType(reportId, 0x03);
   if (featureReportChr == nullptr) {
     featureReportChr = m_hidSvc->createCharacteristic(
-      inputReportChrUuid, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::READ_ENC | NIMBLE_PROPERTY::WRITE_ENC
+      inputReportChrUuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_READ_ENC | BLECharacteristic::PROPERTY_WRITE_ENC
     );
     BLEDescriptor *featureReportDsc = featureReportChr->createDescriptor(
-      featureReportDscUuid, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::READ_ENC | NIMBLE_PROPERTY::WRITE_ENC
+      featureReportDscUuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_READ_ENC | BLECharacteristic::PROPERTY_WRITE_ENC
     );
 
     uint8_t desc1_val[] = {reportId, 0x03};
@@ -249,7 +249,7 @@ BLECharacteristic *BLEHIDDevice::getBootInput() {
     return bootInputChr;
   }
 
-  return m_hidSvc->createCharacteristic(bootInputChrUuid, NIMBLE_PROPERTY::NOTIFY);
+  return m_hidSvc->createCharacteristic(bootInputChrUuid, BLECharacteristic::PROPERTY_NOTIFY);
 }  // getBootInput
 
 /**
@@ -263,7 +263,7 @@ BLECharacteristic *BLEHIDDevice::getBootOutput() {
     return bootOutputChr;
   }
 
-  return m_hidSvc->createCharacteristic(bootOutputChrUuid, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
+  return m_hidSvc->createCharacteristic(bootOutputChrUuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR);
 }  // getBootOutput
 
 /**

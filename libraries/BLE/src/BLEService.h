@@ -45,10 +45,10 @@ public:
   bool isStarted() const;
   bool start();
   BLECharacteristic *
-    createCharacteristic(const char *uuid, uint32_t properties = NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE, uint16_t max_len = BLE_ATT_ATTR_MAX_LEN);
+    createCharacteristic(const char *uuid, uint32_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t max_len = BLE_ATT_ATTR_MAX_LEN);
 
   BLECharacteristic *
-    createCharacteristic(const BLEUUID &uuid, uint32_t properties = NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE, uint16_t max_len = BLE_ATT_ATTR_MAX_LEN);
+    createCharacteristic(const BLEUUID &uuid, uint32_t properties = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE, uint16_t max_len = BLE_ATT_ATTR_MAX_LEN);
   void addCharacteristic(BLECharacteristic *pCharacteristic);
   void removeCharacteristic(BLECharacteristic *pCharacteristic, bool deleteChr = false);
   BLECharacteristic *getCharacteristic(const char *uuid, uint16_t instanceId = 0) const;

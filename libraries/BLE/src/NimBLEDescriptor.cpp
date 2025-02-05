@@ -53,28 +53,28 @@ BLEDescriptor::BLEDescriptor(const BLEUUID &uuid, uint16_t properties, uint16_t 
 
   // convert uint16_t properties to uint8_t for descriptor properties
   uint8_t descProperties = 0;
-  if (properties & NIMBLE_PROPERTY::READ) {
+  if (properties & BLECharacteristic::PROPERTY_READ) {
     descProperties |= BLE_ATT_F_READ;
   }
-  if (properties & (NIMBLE_PROPERTY::WRITE_NR | NIMBLE_PROPERTY::WRITE)) {
+  if (properties & (BLECharacteristic::PROPERTY_WRITE_NR | BLECharacteristic::PROPERTY_WRITE)) {
     descProperties |= BLE_ATT_F_WRITE;
   }
-  if (properties & NIMBLE_PROPERTY::READ_ENC) {
+  if (properties & BLECharacteristic::PROPERTY_READ_ENC) {
     descProperties |= BLE_ATT_F_READ_ENC;
   }
-  if (properties & NIMBLE_PROPERTY::READ_AUTHEN) {
+  if (properties & BLECharacteristic::PROPERTY_READ_AUTHEN) {
     descProperties |= BLE_ATT_F_READ_AUTHEN;
   }
-  if (properties & NIMBLE_PROPERTY::READ_AUTHOR) {
+  if (properties & BLECharacteristic::PROPERTY_READ_AUTHOR) {
     descProperties |= BLE_ATT_F_READ_AUTHOR;
   }
-  if (properties & NIMBLE_PROPERTY::WRITE_ENC) {
+  if (properties & BLECharacteristic::PROPERTY_WRITE_ENC) {
     descProperties |= BLE_ATT_F_WRITE_ENC;
   }
-  if (properties & NIMBLE_PROPERTY::WRITE_AUTHEN) {
+  if (properties & BLECharacteristic::PROPERTY_WRITE_AUTHEN) {
     descProperties |= BLE_ATT_F_WRITE_AUTHEN;
   }
-  if (properties & NIMBLE_PROPERTY::WRITE_AUTHOR) {
+  if (properties & BLECharacteristic::PROPERTY_WRITE_AUTHOR) {
     descProperties |= BLE_ATT_F_WRITE_AUTHOR;
   }
 
