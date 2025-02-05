@@ -214,6 +214,30 @@ bool BLEAddress::operator!=(const BLEAddress &rhs) const {
   return !this->operator==(rhs);
 }  // operator !=
 
+bool BLEAddress::operator<(const BLEAddress &rhs) const {
+  if (this->type != rhs.type) {
+    return false;
+  }
+
+  return memcmp(rhs.val, this->val, sizeof(this->val)) < 0;
+}
+
+bool BLEAddress::operator<=(const BLEAddress &rhs) const {
+  return !this->operator>(rhs);
+}
+
+bool BLEAddress::operator>=(const BLEAddress &rhs) const {
+  return !this->operator<(rhs);
+}
+
+bool BLEAddress::operator>(const BLEAddress &rhs) const {
+  if (this->type != rhs.type) {
+    return false;
+  }
+
+  return memcmp(rhs.val, this->val, sizeof(this->val)) > 0;
+}
+
 /**
  * @brief Convenience operator to convert this address to string representation.
  * @details This allows passing BLEAddress to functions that accept std::string and/or it's methods as a parameter.

@@ -41,13 +41,13 @@
 class BLEAddress : private ble_addr_t {
 public:
   /**
-     * @brief Create a blank address, i.e. 00:00:00:00:00:00, type 0.
-     */
+   * @brief Create a blank address, i.e. 00:00:00:00:00:00, type 0.
+   */
   BLEAddress() = default;
   BLEAddress(const ble_addr_t address);
-  BLEAddress(const uint8_t address[BLE_DEV_ADDR_LEN], uint8_t type);
-  BLEAddress(const std::string &stringAddress, uint8_t type);
-  BLEAddress(const uint64_t &address, uint8_t type);
+  BLEAddress(const uint8_t address[BLE_DEV_ADDR_LEN], uint8_t type = BLE_ADDR_PUBLIC);
+  BLEAddress(const std::string &stringAddress, uint8_t type = BLE_ADDR_PUBLIC);
+  BLEAddress(const uint64_t &address, uint8_t type = BLE_ADDR_PUBLIC);
 
   bool isRpa() const;
   bool isNrpa() const;
@@ -62,8 +62,18 @@ public:
   const BLEAddress &reverseByteOrder();
   bool operator==(const BLEAddress &rhs) const;
   bool operator!=(const BLEAddress &rhs) const;
+  bool operator<(const BLEAddress &rhs) const;
+  bool operator<=(const BLEAddress &rhs) const;
+  bool operator>(const BLEAddress &rhs) const;
+  bool operator>=(const BLEAddress &rhs) const;
   operator std::string() const;
   operator uint64_t() const;
+
+  // Compatibility with old API
+  [[deprecated("Use getBase() instead")]]
+  const uint8_t *getNative() const {
+    return &(getBase()->val);
+  }
 };
 
 #elif defined(CONFIG_BLUEDROID_ENABLED)
