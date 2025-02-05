@@ -380,10 +380,6 @@ if(NOT CONFIG_ARDUINO_SELECTIVE_COMPILATION OR CONFIG_ARDUINO_SELECTIVE_OpenThre
   endif()
 endif()
 
-if(NOT IDF_TARGET STREQUAL "esp32") # Remove this when Bluedroid support is dropped
-  list(APPEND requires esp_nimble)
-endif()
-
 if(IDF_TARGET STREQUAL "esp32p4")
   list(APPEND requires esp_driver_touch_sens)
 endif()
