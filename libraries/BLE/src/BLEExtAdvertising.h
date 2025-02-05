@@ -81,7 +81,7 @@ public:
   void setDirected(bool enable, bool high_duty = true);
   void setAnonymous(bool enable);
   void setPrimaryChannels(bool ch37, bool ch38, bool ch39);
-  void setTxPower(int8_t dbm);
+  void setTXPower(int8_t dbm);
   void setAddress(const BLEAddress &addr);
   void enableScanRequestCallback(bool enable);
   void clearData();

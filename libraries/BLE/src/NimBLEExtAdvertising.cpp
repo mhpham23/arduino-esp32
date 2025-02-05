@@ -370,9 +370,9 @@ void BLEExtAdvertisement::setScannable(bool enable) {
  * @param [in] dbm the transmission power to use in dbm.
  * @details The allowable value range depends on device hardware.
  */
-void BLEExtAdvertisement::setTxPower(int8_t dbm) {
+void BLEExtAdvertisement::setTXPower(int8_t dbm) {
   m_params.tx_power = dbm;
-}  // setTxPower
+}  // setTXPower
 
 /**
  * @brief Sets wether this advertisement should advertise as a connectable device.

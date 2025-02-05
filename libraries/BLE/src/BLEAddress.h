@@ -72,7 +72,7 @@ public:
   // Compatibility with old API
   [[deprecated("Use getBase() instead")]]
   const uint8_t *getNative() const {
-    return &(getBase()->val);
+    return getBase()->val;
   }
 };
 

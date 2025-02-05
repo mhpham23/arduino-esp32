@@ -20,6 +20,14 @@
 #include "soc/soc_caps.h"
 #if SOC_BLE_SUPPORTED
 
+typedef enum {
+  BLE_UNKNOWN_FRAME,
+  BLE_EDDYSTONE_UUID_FRAME,
+  BLE_EDDYSTONE_URL_FRAME,
+  BLE_EDDYSTONE_TLM_FRAME,
+  BLE_FRAME_MAX
+} ble_frame_type_t;
+
 #include "btconfig.h"
 #if defined(CONFIG_NIMBLE_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_OBSERVER)
 
@@ -94,6 +102,9 @@ public:
   const std::vector<uint8_t> &getPayload() const;
   const std::vector<uint8_t>::const_iterator begin() const;
   const std::vector<uint8_t>::const_iterator end() const;
+
+  // Compatibility with Bluedroid
+  [[deprecated]] ble_frame_type_t getFrameType() const;
 
   /**
      * @brief A template to convert the service data to <type\>.
@@ -189,14 +200,6 @@ private:
 #include "BLEAddress.h"
 #include "BLEScan.h"
 #include "BLEUUID.h"
-
-typedef enum {
-  BLE_UNKNOWN_FRAME,
-  BLE_EDDYSTONE_UUID_FRAME,
-  BLE_EDDYSTONE_URL_FRAME,
-  BLE_EDDYSTONE_TLM_FRAME,
-  BLE_FRAME_MAX
-} ble_frame_type_t;
 
 class BLEScan;
 /**
